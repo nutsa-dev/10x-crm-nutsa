@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>10X CRM - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/guard.js"></script>
+</head>
+<body class="app-body">
+
+    <div class="sidebar">
+        <div>
+            <div class="logo" style="cursor: pointer;" onclick="window.location.href='dashboard.html'">10X CRM</div>
+            <div class="nav-links">
+                <a href="dashboard.html" class="active">Dashboard</a>
+                <a href="clients.html">Clients</a>
+                <a href="profile.html">Profile</a>
+            </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 14px; width: 100%;">
+            <button class="btn-theme-fixed" style="width: 100%; justify-content: center;" onclick="toggleTheme()">🌓 Toggle Theme</button>
+            <button class="btn-logout" onclick="handleLogout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header-panel">
+            <h1 id="welcomeMessage">Welcome back!</h1>
+        </div>
+        <p>This is your protected dashboard. Core authentication and layout template is up and running!</p>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/theme.js"></script>
+    <script>
+        // მომხმარებლის სახელით პერსონალიზებული მისალმება [cite: 314]
+        const session = JSON.parse(localStorage.getItem('crm_session'));
+        if (session) {
+            const users = JSON.parse(localStorage.getItem('crm_users')) || [];
+            const user = users.find(u => u.email === session.email);
+            if (user) {
+                const firstName = user.fullName.split(' ')[0]; // მხოლოდ პირველი სახელი [cite: 314]
+                document.getElementById('welcomeMessage').textContent = `Welcome back, ${firstName}!`;
+            }
+        }
+    </script>
+</body>
+</html>
