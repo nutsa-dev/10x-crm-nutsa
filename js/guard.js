@@ -1,32 +1,38 @@
 /**
- * 10X CRM - Auth Guard (P0.1)
- * ეს ფაილი პასუხისმგებელია გვერდების წვდომის კონტროლზე.
- * იგი მოწმდება ჩატვირთვისთანავე, რათა თავიდან ავიცილოთ ეკრანის "ციმციმი".
+ * 10X CRM - Auth Guard
+ * ეს ფაილი პასუხისმგებელია გვერდების წვდომის კონტროლზე და სესიის დახურვაზე (Logout).
  */
 
-// ამოწმებს, არის თუ არა მომხმარებელი ავტორიზებული
+// 1. ამოწმებს, არის თუ არა მომხმარებელი ავტორიზებული
 function isAuthenticated() {
     return localStorage.getItem('crm_session') !== null;
 }
 
-// დაცული გვერდების მცველი (dashboard, clients, profile) 
+// 2. დაცული გვერდების მცველი (dashboard, clients, profile)
 function checkAuthForProtectedRoute() {
     if (!isAuthenticated()) {
-        window.location.href = 'index.html'; // თუ სესია არ არის -> გადამისამართება ლოგინზე [cite: 171, 172]
+        window.location.href = 'index.html'; // თუ სესია არ არის -> გადამისამართება ლოგინზე
     }
 }
 
-// საჯარო გვერდების მცველი (login, signup) [cite: 173]
+// 3. საჯარო გვერდების მცველი (login, signup, forgot-password)
 function checkAuthForPublicPage() {
     if (isAuthenticated()) {
-        window.location.href = 'dashboard.html'; // თუ სესია უკვე არსებობს -> გადამისამართება დეშბორდზე [cite: 173]
+        window.location.href = 'dashboard.html'; // თუ სესია უკვე არსებობს -> გადამისამართება დეშბორდზე
     }
 }
 
-// უშუალოდ გაშვება გვერდის ტიპის მიხედვით (სანამ DOM სრულად ჩაიტვირთება)
+// 4. სესიის დახურვა (Logout ფუნქცია, რომელიც აკლდა!)
+function logout() {
+    localStorage.removeItem('crm_session'); // ვშლით მიმდინარე სესიას
+    window.location.href = 'index.html'; // გადავდივართ ლოგინის გვერდზე
+}
+
+// 5. ავტომატური შემოწმება გვერდის ჩატვირთვისას (Flicker-ის თავიდან ასაცილებლად)
 const currentPath = window.location.pathname;
+
 if (currentPath.includes('dashboard.html') || currentPath.includes('clients.html') || currentPath.includes('profile.html')) {
     checkAuthForProtectedRoute();
-} else if (currentPath.includes('index.html') || currentPath.includes('signup.html') || currentPath === '/' || currentPath.endsWith('/')) {
+} else if (currentPath.includes('index.html') || currentPath.includes('signup.html') || currentPath.includes('forgot-password.html') || currentPath === '/' || currentPath.endsWith('/')) {
     checkAuthForPublicPage();
 }

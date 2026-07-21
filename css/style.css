@@ -1,5 +1,5 @@
 /* ==========================================================================
-   1. დიზაინის სისტემა - Pure Neumorphic UI Kit (Inter Font Version)
+   1. დიზაინის სისტემა - Pure Neumorphic UI Kit (Inter Font)
    ========================================================================== */
 :root {
     --font-main: 'Inter', sans-serif;
@@ -10,6 +10,9 @@
     
     /* --- Light Mode --- */
     --bg-color: #eef2f7;      
+    --bg-card: #eef2f7;
+    --bg-input: #eef2f7;
+    --border-color: #d1d9e6;
     --text-main: #3a3f50;     
     --text-muted: #7e8494;
     
@@ -26,14 +29,14 @@
 /* --- Dark Mode --- */
 body.dark-mode {
     --bg-color: #181a20;
+    --bg-card: #181a20;
+    --bg-input: #181a20;
+    --border-color: #22252e;
     --text-main: #f1f3f7;
     --text-muted: #828a99;
     
     --neo-shadow-out: 9px 9px 18px #0e0f12, -9px -9px 18px #22252e;
-    
-    /* 👈 Dark Mode-ში ჩაზნექილი ჩრდილები სრულიად უქმნება! */
-    --neo-shadow-in: none;
-    
+    --neo-shadow-in: inset 6px 6px 12px #0e0f12, inset -6px -6px 12px #22252e;
     --neo-shadow-card-hover: 12px 12px 24px #0a0b0d, -12px -12px 24px #262933;
 }
 
@@ -50,11 +53,9 @@ body.dark-mode {
 }
 
 html, body {
-    height: 100%;
+    min-height: 100vh;
     background-color: var(--bg-color) !important;
-    background-image: none !important;
     color: var(--text-main);
-    overflow: hidden;
     font-size: 19px;
 }
 
@@ -62,15 +63,22 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     padding: 20px;
     position: relative;
 }
 
-.app-body {
-    display: flex;
+.dashboard-body {
     height: 100vh;
-    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* ბლოკავს სქროლვას დესკტოპზე */
+}
+
+.app-body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .fixed-theme-wrapper {
@@ -81,7 +89,7 @@ html, body {
 }
 
 /* ==========================================================================
-   3. ნეომორფული ამოზნექილი ქარდები და მასიური ფორმები
+   3. ნეომორფული ამოზნექილი ქარდები და მასიური ფორმები (Auth Pages)
    ========================================================================== */
 .card {
     background: var(--bg-color);
@@ -102,7 +110,6 @@ h2 {
     color: var(--text-main);
 }
 
-/* პატარა ქვესათაური სათაურის ქვეშ */
 .card-subtitle {
     text-align: center;
     font-size: 18px;
@@ -115,7 +122,6 @@ h2 {
     margin-bottom: 30px !important;
 }
 
-/* Label-ების სტილები */
 label {
     display: block;
     font-size: 28px !important;
@@ -124,7 +130,6 @@ label {
     color: var(--text-main);
 }
 
-/* ჩაზნექილი ინპუტები */
 .form-input-neo {
     width: 100%;
     padding: 22px 26px !important;
@@ -140,7 +145,6 @@ label {
     transition: all 0.2s ease;
 }
 
-/* მუქ თემაში ინპუტებს დავუმატოთ ძალიან ნაზი საზღვარი, რომ სრულიად ბრტყელი არ გამოჩნდეს */
 body.dark-mode .form-input-neo {
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
@@ -161,7 +165,7 @@ body.dark-mode .form-input-neo {
 
 .error-text {
     color: var(--danger-color);
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 700;
     margin-top: 10px;
     margin-left: 22px;
@@ -169,19 +173,19 @@ body.dark-mode .form-input-neo {
 
 .global-error {
     color: var(--danger-color);
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     text-align: center;
     margin-bottom: 24px;
 }
 
-/* ქვედა ბმული (Sign up) */
 .link {
     margin-top: 42px !important;
     margin-left: 22px;
-    font-size: 28px !important;
+    font-size: 24px !important;
     font-weight: 600;
     color: var(--text-muted);
+    text-align: center;
 }
 
 .link a {
@@ -195,7 +199,7 @@ body.dark-mode .form-input-neo {
 }
 
 /* ==========================================================================
-   4. ნეომორფული ღილაკები (Full Orange Accent Button - No Shadow)
+   4. ნეომორფული ღილაკები
    ========================================================================== */
 .btn-submit-glass {
     width: 100%;
@@ -207,40 +211,26 @@ body.dark-mode .form-input-neo {
     border: none;
     border-radius: var(--radius-md);
     cursor: pointer;
-    box-shadow: none !important; /* 👈 ჩრდილი სრულიად გაუქმებულია! */
+    box-shadow: none !important;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    position: relative;
-    overflow: hidden;
     margin-top: 28px !important;
     transition: all 0.2s ease;
 }
 
-.btn-submit-glass::after {
-    display: none !important;
-}
-
 .btn-submit-glass:hover {
     transform: translateY(-2px);
-    background: #ff661a !important; /* ჰოვერზე ოდნავ უფრო ღია სტაფილოსფერი */
-    box-shadow: none !important; /* 👈 ჰოვერზეც არ აქვს ჩრდილი */
-    color: #ffffff !important;
+    background: #ff661a !important;
 }
 
 .btn-submit-glass:active {
     transform: translateY(0);
-    box-shadow: none !important;
 }
 
-/* მინიმალისტური მრგვალი Toggle ღილაკი */
 .btn-theme-fixed {
     width: 82px;
     height: 82px;
-    padding: 0;
-    margin-top: 35px;
-    margin-right: 35px;
     font-size: 42px;
     background: var(--bg-color);
     border: none;
@@ -258,99 +248,320 @@ body.dark-mode .form-input-neo {
     box-shadow: var(--neo-shadow-in);
 }
 
-.btn-logout {
-    padding: 16px 28px;
-    font-size: 17px;
+/* ==========================================================================
+   5. HEADER & NAVIGATION (Dashboard / Clients / Profile)
+   ========================================================================== */
+.app-header {
+    background: var(--bg-color);
+    box-shadow: var(--neo-shadow-out);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-shrink: 0;
+}
+
+.header-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.brand {
+    font-size: 1.8rem;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+}
+
+.brand-logo { color: var(--accent-orange); }
+.brand-title { color: var(--text-main); }
+
+.nav-menu { display: flex; gap: 1.2rem; }
+
+.nav-link {
+    text-decoration: none;
+    color: var(--text-muted);
     font-weight: 800;
-    color: var(--text-main);
+    font-size: 1.1rem;
+    padding: 0.8rem 1.4rem;
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+}
+
+.nav-link:hover { color: var(--text-main); box-shadow: var(--neo-shadow-in); }
+.nav-link.active { color: var(--accent-orange); box-shadow: var(--neo-shadow-in); }
+
+.header-actions { display: flex; align-items: center; gap: 1.2rem; }
+
+.live-clock {
+    font-family: 'Inter', monospace;
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--neo-shadow-in);
+}
+
+.btn-theme, .btn-logout {
     background: var(--bg-color);
     border: none;
+    color: var(--text-main);
+    padding: 0.7rem 1.4rem;
     border-radius: var(--radius-sm);
     box-shadow: var(--neo-shadow-out);
     cursor: pointer;
+    font-weight: 800;
+    font-size: 1rem;
+    transition: all 0.2s ease;
 }
 
-.btn-logout:hover {
+.btn-theme:hover, .btn-logout:hover { box-shadow: var(--neo-shadow-in); color: var(--accent-orange); }
+.btn-logout:hover { color: var(--danger-color); }
+
+/* ==========================================================================
+   6. EXECUTIVE SINGLE-PAGE DASHBOARD LAYOUT (100vh Fit)
+   ========================================================================== */
+.dashboard-container {
+    flex: 1;
+    max-width: 1440px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 1.25rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    box-sizing: border-box;
+    min-height: 0;
+}
+
+.welcome-section {
+    background: var(--bg-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--neo-shadow-out);
+    padding: 1rem 1.5rem;
+    flex-shrink: 0;
+}
+
+.welcome-section h1 { font-size: 1.6rem; font-weight: 800; text-align: left; }
+.welcome-section .subtitle { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; margin-top: 0.2rem; }
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+    flex-shrink: 0;
+}
+
+.metric-card {
+    background: var(--bg-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--neo-shadow-out);
+    padding: 1.1rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+.metric-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
     box-shadow: var(--neo-shadow-in);
-    color: var(--danger-color);
+    color: var(--accent-orange);
+    flex-shrink: 0;
+}
+
+.metric-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); font-weight: 800; }
+.metric-value { font-size: 1.6rem; font-weight: 800; margin-top: 0.1rem; color: var(--text-main); }
+
+.dashboard-bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 1.25rem;
+    flex: 1;
+    min-height: 0;
 }
 
 /* ==========================================================================
-   5. აპლიკაციის შიდა სტრუქტურა (Sidebar & Navigation)
+   7. PIPELINE INFOGRAPHIC PROGRESS BARS
    ========================================================================== */
-.sidebar {
-    width: 300px;
+.pipeline-section {
     background: var(--bg-color);
+    border-radius: var(--radius-lg);
     box-shadow: var(--neo-shadow-out);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.pipeline-section h2 { text-align: left; font-size: 1.2rem; font-weight: 800; margin-bottom: 1rem; }
+
+.pipeline-infographic {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 40px 26px;
-    height: 100%;
-    z-index: 10;
+    gap: 0.8rem;
+    flex: 1;
 }
 
-.logo {
-    font-size: 32px;
-    font-weight: 900;
-    color: var(--text-main);
-    margin-bottom: 50px;
-    padding-left: 8px;
-    letter-spacing: -1px;
-}
-
-.logo::first-letter {
-    color: var(--accent-orange);
-}
-
-.nav-links {
+.info-stage {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 0.4rem;
 }
 
-.nav-links a {
-    font-size: 20px;
+.info-label-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.info-name {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.info-val {
+    font-size: 1.1rem;
     font-weight: 800;
     color: var(--text-muted);
-    text-decoration: none;
-    padding: 18px 24px;
-    border-radius: var(--radius-sm);
 }
 
-.nav-links a:hover {
-    color: var(--text-main);
+.progress-track {
+    width: 100%;
+    height: 12px;
+    background: var(--bg-color);
     box-shadow: var(--neo-shadow-in);
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
 }
 
-.nav-links a.active {
-    color: var(--accent-orange);
-    box-shadow: var(--neo-shadow-in);
-}
-
-.main-content {
-    flex: 1;
-    padding: 50px;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
+.progress-fill {
     height: 100%;
+    border-radius: 20px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+.fill-lead { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+.fill-contacted { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.fill-proposal { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+.fill-won { background: linear-gradient(90deg, #10b981, #34d399); }
+.fill-lost { background: linear-gradient(90deg, #ef4444, #f87171); }
 
 /* ==========================================================================
-   6. Clients Base & Grid
+   8. RECENT CLIENTS TABLE (ENLARGED FONTS)
+   ========================================================================== */
+.recent-clients-section {
+    background: var(--bg-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--neo-shadow-out);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.section-header h2 { text-align: left; font-size: 1.25rem; font-weight: 800; margin: 0; }
+.link-view-all { color: var(--accent-orange); text-decoration: none; font-weight: 800; font-size: 0.95rem; }
+
+.table-responsive {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.data-table th {
+    color: var(--text-muted);
+    font-weight: 800;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    padding: 0.85rem 1rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.data-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.data-table td strong {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.data-table td:last-child {
+    white-space: nowrap;
+    text-align: right;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.status-badge {
+    padding: 0.4rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.badge-lead { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+.badge-contacted { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+.badge-proposal { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+.badge-won { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.badge-lost { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+
+/* ==========================================================================
+   9. CLIENTS BASE & GRID STYLES
    ========================================================================== */
 .toolbar {
-    background: var(--bg-color) !important;
-    box-shadow: var(--neo-shadow-out) !important;
-    border: none !important;
-    margin-bottom: 35px !important;
-    padding: 24px !important;
+    background: var(--bg-color);
+    box-shadow: var(--neo-shadow-out);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.8rem;
+    margin-bottom: 1.8rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.filter-chips {
+    display: flex;
+    gap: 0.8rem;
 }
 
 .filter-chips .chip {
-    padding: 16px 28px;
-    font-size: 17px;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.95rem;
     font-weight: 800;
     border: none;
     background: var(--bg-color);
@@ -358,6 +569,7 @@ body.dark-mode .form-input-neo {
     border-radius: var(--radius-sm);
     box-shadow: var(--neo-shadow-out);
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .filter-chips .chip.active {
@@ -367,20 +579,20 @@ body.dark-mode .form-input-neo {
 
 .clients-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
-    gap: 30px;
-    padding-bottom: 35px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    padding-bottom: 2rem;
 }
 
 .client-card {
     background: var(--bg-color);
     box-shadow: var(--neo-shadow-out);
-    border-radius: var(--radius-md);
-    padding: 28px;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    border: none;
+    gap: 1rem;
+    transition: all 0.2s ease;
 }
 
 .client-card:hover {
@@ -388,76 +600,20 @@ body.dark-mode .form-input-neo {
     box-shadow: var(--neo-shadow-card-hover);
 }
 
-.client-avatar {
-    width: 68px;
-    height: 68px;
-    border-radius: 50%;
-    box-shadow: var(--neo-shadow-out);
-}
-
-.client-title-info h3 {
-    font-size: 24px;
-    font-weight: 800;
-}
-
-.client-details {
-    background: var(--bg-color);
-    padding: 20px;
-    border-radius: var(--radius-sm);
-    box-shadow: var(--neo-shadow-in);
-}
-
-.client-detail-item {
-    font-size: 17px;
-    font-weight: 700;
-    margin-bottom: 8px;
-}
-
-.select-status-inline {
-    padding: 14px 20px;
-    font-size: 16px;
-    font-weight: 800;
-    border: none;
-    border-radius: var(--radius-sm);
-    background: var(--bg-color);
-    color: var(--text-main);
-    box-shadow: var(--neo-shadow-out);
-    outline: none;
-}
-
-.status-won { color: var(--accent-orange); font-weight: 900; }
-
 /* ==========================================================================
-   7. Overlays, Modals & Toast
+   10. TOAST & OVERLAYS
    ========================================================================== */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(217, 225, 238, 0.85);
-    backdrop-filter: blur(10px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-}
-
-body.dark-mode .modal-overlay {
-    background: rgba(14, 15, 18, 0.85);
-}
-
 .toast {
     position: fixed;
     bottom: 40px;
     right: 40px;
-    padding: 22px 38px;
-    font-size: 20px;
+    padding: 20px 36px;
+    font-size: 18px;
     font-weight: 800;
     border-radius: var(--radius-md);
     background: var(--bg-color);
     box-shadow: var(--neo-shadow-out);
     color: var(--accent-orange);
     z-index: 1000;
+    display: none;
 }

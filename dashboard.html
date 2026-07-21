@@ -2,48 +2,180 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>10X CRM - Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10X CRM - Executive Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <script src="js/guard.js"></script>
-</head>
-<body class="app-body">
 
-    <div class="sidebar">
-        <div>
-            <div class="logo" style="cursor: pointer;" onclick="window.location.href='dashboard.html'">10X CRM</div>
-            <div class="nav-links">
-                <a href="dashboard.html" class="active">Dashboard</a>
-                <a href="clients.html">Clients</a>
-                <a href="profile.html">Profile</a>
+    <script src="js/guard.js"></script>
+    <script src="js/theme.js"></script>
+</head>
+<body class="dashboard-body">
+
+    <div class="toast" id="toast"></div>
+
+    <header class="app-header">
+        <div class="header-container">
+            <div class="brand">
+                <span class="brand-logo">10X</span>
+                <span class="brand-title">CRM</span>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="dashboard.html" class="nav-link active">Dashboard</a>
+                <a href="clients.html" class="nav-link">Clients</a>
+                <a href="profile.html" class="nav-link">Profile</a>
+            </nav>
+
+            <div class="header-actions">
+                <div class="live-clock" id="liveClock">00:00:00 AM</div>
+                <button type="button" class="btn-theme" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle Theme">🌙</button>
+                <button type="button" class="btn-logout" onclick="logout()">Log Out</button>
             </div>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 14px; width: 100%;">
-            <button class="btn-theme-fixed" style="width: 100%; justify-content: center;" onclick="toggleTheme()">🌓 Toggle Theme</button>
-            <button class="btn-logout" onclick="handleLogout()">Logout</button>
-        </div>
-    </div>
+    </header>
 
-    <div class="main-content">
-        <div class="header-panel">
-            <h1 id="welcomeMessage">Welcome back!</h1>
-        </div>
-        <p>This is your protected dashboard. Core authentication and layout template is up and running!</p>
-    </div>
+    <main class="dashboard-container">
+        
+        <section class="welcome-section">
+            <div class="welcome-content">
+                <h1 id="welcomeGreeting">Welcome back! 👋</h1>
+                <p class="subtitle" id="currentDate">Loading date...</p>
+            </div>
+        </section>
 
-    <script src="js/auth.js"></script>
-    <script src="js/theme.js"></script>
-    <script>
-        // მომხმარებლის სახელით პერსონალიზებული მისალმება [cite: 314]
-        const session = JSON.parse(localStorage.getItem('crm_session'));
-        if (session) {
-            const users = JSON.parse(localStorage.getItem('crm_users')) || [];
-            const user = users.find(u => u.email === session.email);
-            if (user) {
-                const firstName = user.fullName.split(' ')[0]; // მხოლოდ პირველი სახელი [cite: 314]
-                document.getElementById('welcomeMessage').textContent = `Welcome back, ${firstName}!`;
-            }
-        }
-    </script>
+        <section class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </div>
+                <div class="metric-data">
+                    <span class="metric-label">Total Clients</span>
+                    <h3 class="metric-value" id="totalClients">0</h3>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                </div>
+                <div class="metric-data">
+                    <span class="metric-label">Active Deals</span>
+                    <h3 class="metric-value" id="activeDeals">0</h3>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                </div>
+                <div class="metric-data">
+                    <span class="metric-label">Pipeline Value</span>
+                    <h3 class="metric-value" id="totalRevenue">$0</h3>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                </div>
+                <div class="metric-data">
+                    <span class="metric-label">Win Rate</span>
+                    <h3 class="metric-value" id="conversionRate">0%</h3>
+                </div>
+            </div>
+        </section>
+
+        <div class="dashboard-bottom-grid">
+            
+            <section class="pipeline-section">
+                <div class="section-header">
+                    <h2>Pipeline Infographics</h2>
+                </div>
+                <div class="pipeline-infographic">
+                    
+                    <div class="info-stage stage-lead">
+                        <div class="info-label-group">
+                            <span class="info-name">Lead</span>
+                            <span class="info-val" id="countLead">0</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill fill-lead" id="barLead" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="info-stage stage-contacted">
+                        <div class="info-label-group">
+                            <span class="info-name">Contacted</span>
+                            <span class="info-val" id="countContacted">0</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill fill-contacted" id="barContacted" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="info-stage stage-proposal">
+                        <div class="info-label-group">
+                            <span class="info-name">Proposal</span>
+                            <span class="info-val" id="countProposal">0</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill fill-proposal" id="barProposal" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="info-stage stage-won">
+                        <div class="info-label-group">
+                            <span class="info-name">Won</span>
+                            <span class="info-val" id="countWon">0</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill fill-won" id="barWon" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="info-stage stage-lost">
+                        <div class="info-label-group">
+                            <span class="info-name">Lost</span>
+                            <span class="info-val" id="countLost">0</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill fill-lost" id="barLost" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <section class="recent-clients-section">
+                <div class="section-header">
+                    <h2>Recent Clients</h2>
+                    <a href="clients.html" class="link-view-all">View All Clients &rarr;</a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 32%;">Name</th>
+                                <th style="width: 32%;">Company</th>
+                                <th style="width: 18%;">Status</th>
+                                <th style="width: 18%; text-align: right;">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentClientsTable">
+                            <tr>
+                                <td colspan="4" class="text-center">Loading clients...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+
+    </main>
+
+    <script src="js/dashboard.js"></script>
 </body>
 </html>
