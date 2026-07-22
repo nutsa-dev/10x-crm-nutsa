@@ -1,41 +1,58 @@
 /**
- * 10X CRM - Theme Management (Head-Optimized)
+ * 10X CRM - Global Theme & Live Clock Controller
+ * ტვირთავს თემას (Light/Dark) და მართავს ჰედერის ცოცხალ საათს ყველა გვერდზე.
  */
 
-// 1. მყისიერი შემოწმება DOM-ის ჩატვირთვამდე (Flicker-ის თავიდან ასაცილებლად)
-(function initTheme() {
-    const savedTheme = localStorage.getItem('crm_theme');
-    if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark-mode'); // <html> ტეგზე ამატებს კლასს
-    }
-})();
-
-// 2. გვერდის ჩატვირთვის შემდეგ აიკონების განახლება
+// გვერდის ჩატვირთვისთანავე ვუშვებთ თემას და საათს
 document.addEventListener('DOMContentLoaded', () => {
-    // თუ <html>-ზე არის dark-mode, body-საც გადავცეთ თავსებადობისთვის
-    if (document.documentElement.classList.contains('dark-mode')) {
-        document.body.classList.add('dark-mode');
-    }
-    updateThemeIcon();
+    applyStoredTheme();
+    initGlobalClock();
 });
 
-// 3. თემის გადართვა
-function toggleTheme() {
-    const isDarkHtml = document.documentElement.classList.toggle('dark-mode');
-    document.body.classList.toggle('dark-mode', isDarkHtml);
-    
-    localStorage.setItem('crm_theme', isDarkHtml ? 'dark' : 'light');
-    updateThemeIcon();
+// ==========================================================================
+// 1. ცოცხალი საათის გლობალური ფუნქცია (Dashboard, Clients, Profile)
+// ==========================================================================
+function initGlobalClock() {
+    const clockElement = document.getElementById('liveClock');
+    if (!clockElement) return;
+
+    function updateTime() {
+        const now = new Date();
+        clockElement.textContent = now.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        });
+    }
+
+    updateTime();
+    setInterval(updateTime, 1000);
 }
 
-// 4. აიკონის განახლება
-function updateThemeIcon() {
-    const toggleBtns = document.querySelectorAll('.btn-theme-fixed, #themeToggleBtn');
-    const isDark = document.documentElement.classList.contains('dark-mode') || document.body.classList.contains('dark-mode');
+// ==========================================================================
+// 2. თემის გადართვის ლოგიკა (Light / Dark Mode)
+// ==========================================================================
+function applyStoredTheme() {
+    const savedTheme = localStorage.getItem('crm_theme') || 'light';
+    const toggleBtn = document.getElementById('themeToggleBtn');
 
-    toggleBtns.forEach(btn => {
-        if (btn) {
-            btn.textContent = isDark ? '☀️' : '🌙';
-        }
-    });
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        if (toggleBtn) toggleBtn.textContent = '☀️';
+    } else {
+        document.body.classList.remove('dark-mode');
+        if (toggleBtn) toggleBtn.textContent = '🌙';
+    }
+}
+
+function toggleTheme() {
+    const isDark = document.body.classList.toggle('dark-mode');
+    const newTheme = isDark ? 'dark' : 'light';
+    localStorage.setItem('crm_theme', newTheme);
+
+    const toggleBtn = document.getElementById('themeToggleBtn');
+    if (toggleBtn) {
+        toggleBtn.textContent = isDark ? '☀️' : '🌙';
+    }
 }

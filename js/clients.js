@@ -1,16 +1,21 @@
 /**
- * 10X CRM - Clients Management (Day 5 - COMPLETE Edition)
+ * 10X CRM - Clients Management Controller
+ * ოქროს ციკლის ლოგიკა: LocalStorage -> API (GET, POST, DELETE) -> Render -> Sync
  */
 
 let clientsState = [];
 let currentDetailsClientId = null;
 
-// ფილტრაციის მიმდინარე მდგომარეობა
+// ფილტრაციის საწყისი მდგომარეობა
 let currentFilterStatus = 'All';
 let currentSearchQuery = '';
 let currentSortOption = 'Newest';
 
+// ==========================================================================
+// 1. ინიციალიზაცია და API-დან წამოღება (P4.2)
+// ==========================================================================
 async function initClients() {
+    initClock(); // Header Clock
     const localClients = localStorage.getItem('crm_clients');
 
     if (localClients) {
@@ -23,33 +28,51 @@ async function initClients() {
     document.getElementById('searchInput')?.addEventListener('input', handleSearchInput);
 }
 
+// ცოცხალი საათის ფუნქცია Header-ისთვის
+function initClock() {
+    const clockElement = document.getElementById('liveClock');
+    if (!clockElement) return;
+
+    function updateTime() {
+        const now = new Date();
+        clockElement.textContent = now.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        });
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+}
+
 // ჩატვირთვა API-დან + Error Handling (P4.2)
 async function fetchClientsFromAPI() {
     const container = document.getElementById('clientsContainer');
-
     if (container) {
-        container.innerHTML = '<div class="loading-box" id="loadingIndicator">Loading clients...</div>';
+        container.innerHTML = '<div class="loading-box">Loading clients...</div>';
     }
 
     try {
         const response = await fetch('https://dummyjson.com/users?limit=30');
         
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error('Network response failed');
         }
 
         const data = await response.json();
         
         clientsState = data.users.map(user => {
             const randomDealValue = Math.floor(Math.random() * (10000 - 500 + 1)) + 500;
-            
+            const fullName = `${user.firstName} ${user.lastName}`.trim();
+
             return {
                 id: user.id,
-                name: `${user.firstName}${user.lastName}`,
-                phone: user.phone,
-                email: user.email,
-                company: user.company ? user.company.name : 'Independent LLC',
-                image: user.image,
+                name: fullName,
+                phone: user.phone || '+1 555-0192',
+                email: user.email.toLowerCase(),
+                company: user.company ? user.company.name : 'Acme Corporation',
+                image: user.image || `https://dummyjson.com/icon/emilys/128`,
                 status: 'Lead',
                 dealValue: randomDealValue,
                 notes: [],
@@ -63,38 +86,44 @@ async function fetchClientsFromAPI() {
     } catch (error) {
         console.error('Error fetching clients:', error);
         if (container) {
-            // Error Handling: Retry ღილაკით (P4.2)
             container.innerHTML = `
-                <div class="loading-box" style="color: var(--danger-color); display: flex; flex-direction: column; gap: 16px; align-items: center;">
+                <div class="error-state-box">
                     <p>Could not load clients. Check your connection and try again.</p>
-                    <button class="btn-logout" style="width: auto; padding: 10px 20px; font-size: 15px;" onclick="fetchClientsFromAPI()">🔄 Retry</button>
+                    <button class="btn-logout" onclick="fetchClientsFromAPI()">🔄 Retry</button>
                 </div>`;
         }
     }
 }
 
-// ფილტრების გატარება
+
+// ==========================================================================
+// 2. ფილტრაცია, ძებნა და სორტირება (P4.7)
+// ==========================================================================
 function getVisibleClients() {
     let result = [...clientsState];
 
+    // ა. ფილტრაცია სტატუსით
     if (currentFilterStatus !== 'All') {
         result = result.filter(client => client.status === currentFilterStatus);
     }
 
+    // ბ. ძებნა სახელის, კომპანიის ან მეილის მიხედვით
     if (currentSearchQuery) {
         const query = currentSearchQuery.toLowerCase();
         result = result.filter(client => 
-            client.name.toLowerCase().includes(query) || 
-            client.company.toLowerCase().includes(query)
+            (client.name && client.name.toLowerCase().includes(query)) || 
+            (client.company && client.company.toLowerCase().includes(query)) ||
+            (client.email && client.email.toLowerCase().includes(query))
         );
     }
 
+    // გ. სორტირება
     if (currentSortOption === 'Newest') {
         result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     } else if (currentSortOption === 'Name') {
         result.sort((a, b) => a.name.localeCompare(b.name));
     } else if (currentSortOption === 'DealValue') {
-        result.sort((a, b) => b.dealValue - a.dealValue);
+        result.sort((a, b) => (b.dealValue || 0) - (a.dealValue || 0));
     }
 
     return result;
@@ -131,54 +160,60 @@ function handleSortChange() {
     }
 }
 
-// ბარათების რენდერი (ბარათზე დაკლიკებით იხსნება დეტალები) (P4.8)
+
+// ==========================================================================
+// 3. ბარათების რენდერინგი DOM-ში (P4.3)
+// ==========================================================================
 function renderClients(clients) {
     const container = document.getElementById('clientsContainer');
     if (!container) return;
 
     if (clients.length === 0) {
-        container.innerHTML = '<div class="loading-box">No clients found.</div>';
+        container.innerHTML = '<div class="empty-state-box">No clients found matching your search criteria.</div>';
         return;
     }
 
     container.innerHTML = '';
 
     clients.forEach(client => {
-        const dealFormatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(client.dealValue);
-        const statusClass = `status-${client.status.toLowerCase()}`;
+        const dealFormatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(client.dealValue || 0);
+        const statusClass = `badge-${(client.status || 'lead').toLowerCase()}`;
 
         const cardHTML = `
             <div class="client-card" data-id="${client.id}" onclick="openDetailsModal(${client.id})">
-                <div class="client-header">
-                    <img src="${client.image}" alt="${client.name}" class="client-avatar" onerror="this.src='https://dummyjson.com/icon/emilys/128'">
+                <div class="client-card-header">
+                    <img src="${escapeHTML(client.image)}" alt="${escapeHTML(client.name)}" class="client-avatar" onerror="this.src='https://dummyjson.com/icon/emilys/128'">
                     <div class="client-title-info">
-                        <h3 class="client-name">${client.name}</h3>
-                        <span class="client-company">${client.company}</span>
+                        <h3>${escapeHTML(client.name)}</h3>
+                        <span class="client-company-name">${escapeHTML(client.company)}</span>
                     </div>
                 </div>
-                <div class="client-details">
-                    <div class="client-detail-item">
+
+                <div class="client-card-body">
+                    <div class="card-info-row">
                         <span>Email:</span>
-                        <p style="font-size: 13px; font-weight: 700; color: var(--text-main);">${client.email}</p>
+                        <strong>${escapeHTML(client.email)}</strong>
                     </div>
-                    <div class="client-detail-item">
+                    <div class="card-info-row">
                         <span>Phone:</span>
-                        <p style="font-size: 13px; font-weight: 700; color: var(--text-main);">${client.phone}</p>
+                        <strong>${escapeHTML(client.phone)}</strong>
                     </div>
-                    <div class="client-detail-item">
-                        <span>Deal Value:</span>
-                        <span style="color: var(--accent-color); font-weight: 800;">${dealFormatted}</span>
+                    <div class="card-info-row">
+                        <span>Value:</span>
+                        <strong class="deal-value-text">${dealFormatted}</strong>
                     </div>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; gap: 10px;">
-                    <select class="select-status-inline ${statusClass}" onclick="event.stopPropagation()" onchange="updateClientStatus(${client.id}, this.value)">
+
+                <div class="client-card-footer" onclick="event.stopPropagation()">
+                    <select class="select-status-inline ${statusClass}" onchange="updateClientStatus(${client.id}, this.value)">
                         <option value="Lead" ${client.status === 'Lead' ? 'selected' : ''}>Lead</option>
                         <option value="Contacted" ${client.status === 'Contacted' ? 'selected' : ''}>Contacted</option>
+                        <option value="Proposal" ${client.status === 'Proposal' ? 'selected' : ''}>Proposal</option>
                         <option value="Won" ${client.status === 'Won' ? 'selected' : ''}>Won</option>
                         <option value="Lost" ${client.status === 'Lost' ? 'selected' : ''}>Lost</option>
                     </select>
                     
-                    <button class="btn-logout" style="padding: 8px 14px; font-size: 13px; margin: 0;" onclick="event.stopPropagation(); deleteClient(${client.id})">Delete</button>
+                    <button type="button" class="btn-delete-client" onclick="deleteClient(${client.id})">Delete</button>
                 </div>
             </div>
         `;
@@ -201,31 +236,31 @@ function updateClientStatus(id, newStatus) {
 }
 
 
-// --- კლიენტის დეტალების მოდალი და შენიშვნები (P4.8) ---
-
+// ==========================================================================
+// 4. კლიენტის დეტალების მოდალი და შენიშვნები (P4.8)
+// ==========================================================================
 function openDetailsModal(id) {
     const client = clientsState.find(c => c.id === id);
     if (!client) return;
 
     currentDetailsClientId = id;
 
-    // მონაცემების შევსება
-    document.getElementById('detAvatar').src = client.image;
+    document.getElementById('detAvatar').src = client.image || 'https://dummyjson.com/icon/emilys/128';
     document.getElementById('detName').textContent = client.name;
     document.getElementById('detCompany').textContent = client.company;
     document.getElementById('detEmail').textContent = client.email;
     document.getElementById('detPhone').textContent = client.phone || 'N/A';
     
-    const dateFormatted = new Date(client.createdAt).toLocaleDateString('en-US');
+    const dateFormatted = client.createdAt 
+        ? new Date(client.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+        : 'N/A';
+        
     document.getElementById('detMeta').textContent = `${client.status} • Client since ${dateFormatted}`;
 
-    // შენიშვნების რენდერი
     renderNotes(client.notes);
 
-    // მოდალის ჩვენება
     document.getElementById('clientDetailsModal').style.display = 'flex';
 
-    // "Add Note" ღილაკზე ივენთის მიბმა
     const addNoteBtn = document.getElementById('addNoteBtn');
     addNoteBtn.onclick = handleAddNote;
 }
@@ -236,41 +271,39 @@ function closeDetailsModal() {
     currentDetailsClientId = null;
 }
 
-// შენიშვნების სია
 function renderNotes(notes) {
     const container = document.getElementById('notesContainer');
     if (!container) return;
 
     if (!notes || notes.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 13px;">No notes recorded yet.</p>';
+        container.innerHTML = '<p class="no-notes-text">No notes recorded yet.</p>';
         return;
     }
 
     container.innerHTML = '';
     notes.forEach(note => {
         const noteHTML = `
-            <div style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 8px;">
-                <p style="font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 2px;">${note.text}</p>
-                <span style="font-size: 11px; font-weight: 500; color: var(--text-muted);">${note.date}</span>
+            <div class="note-item">
+                <p class="note-text">${escapeHTML(note.text)}</p>
+                <span class="note-date">${note.date}</span>
             </div>
         `;
         container.insertAdjacentHTML('beforeend', noteHTML);
     });
 }
 
-// ახალი შენიშვნის დამატება
 function handleAddNote() {
     const input = document.getElementById('newNoteInput');
     const text = input.value.trim();
 
-    if (!text) return; // ცარიელი არ ემატება (P4.8)
+    if (!text) return;
 
     clientsState = clientsState.map(client => {
         if (client.id === currentDetailsClientId) {
             const updatedNotes = [...(client.notes || [])];
             updatedNotes.push({
                 text: text,
-                date: new Date().toLocaleString('en-US')
+                date: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })
             });
             return { ...client, notes: updatedNotes };
         }
@@ -279,14 +312,11 @@ function handleAddNote() {
 
     localStorage.setItem('crm_clients', JSON.stringify(clientsState));
     
-    // განვაახლოთ მიმდინარე მოდალიც
     const updatedClient = clientsState.find(c => c.id === currentDetailsClientId);
     renderNotes(updatedClient.notes);
-    
     input.value = '';
 }
 
-// 1 წუთიანი შეხსენება (P4.8)
 function setOneMinReminder() {
     const client = clientsState.find(c => c.id === currentDetailsClientId);
     if (!client) return;
@@ -296,19 +326,17 @@ function setOneMinReminder() {
 
     setTimeout(() => {
         showGlobalToast(`🔔 Follow up: ${client.name}`, true);
-    }, 60000); // 60 წამი
+    }, 60000);
 }
 
-// დაკლიკება Overlay-ზე დასახურად
 document.getElementById('clientDetailsModal')?.addEventListener('click', function(event) {
-    if (event.target === this) {
-        closeDetailsModal();
-    }
+    if (event.target === this) closeDetailsModal();
 });
 
 
-// --- მოდალის მართვის ფუნქციები (P4.4) ---
-
+// ==========================================================================
+// 5. ახალი კლიენტის დამატების მოდალი (P4.4, P4.5)
+// ==========================================================================
 function openAddClientModal() {
     const modal = document.getElementById('addClientModal');
     if (modal) {
@@ -326,9 +354,7 @@ function closeAddClientModal() {
 }
 
 document.getElementById('addClientModal')?.addEventListener('click', function(event) {
-    if (event.target === this) {
-        closeAddClientModal();
-    }
+    if (event.target === this) closeAddClientModal();
 });
 
 function clearClientFormErrors() {
@@ -341,25 +367,16 @@ function clearClientFormErrors() {
     inputs.forEach(input => input.classList.remove('input-error'));
 }
 
-// --- ახალი კლიენტის დამატება (P4.4, P4.5) ---
-
 async function handleAddClient(event) {
     event.preventDefault();
     clearClientFormErrors();
 
-    const nameInput = document.getElementById('clientName');
-    const emailInput = document.getElementById('clientEmail');
-    const phoneInput = document.getElementById('clientPhone');
-    const companyInput = document.getElementById('clientCompany');
-    const dealValueInput = document.getElementById('clientDealValue');
-    const statusInput = document.getElementById('clientStatus');
-
-    const name = nameInput.value.trim();
-    const email = emailInput.value.trim().toLowerCase();
-    const phone = phoneInput.value.trim();
-    const company = companyInput.value.trim();
-    const dealValue = parseFloat(dealValueInput.value);
-    const status = statusInput.value;
+    const name = document.getElementById('clientName').value.trim();
+    const email = document.getElementById('clientEmail').value.trim().toLowerCase();
+    const phone = document.getElementById('clientPhone').value.trim();
+    const company = document.getElementById('clientCompany').value.trim();
+    const dealValue = parseFloat(document.getElementById('clientDealValue').value);
+    const status = document.getElementById('clientStatus').value;
 
     let hasError = false;
 
@@ -385,7 +402,7 @@ async function handleAddClient(event) {
         hasError = true;
     }
 
-    if (company.length === 0) {
+    if (!company) {
         showClientError('clientCompany', 'clientCompanyError', 'Company name is required');
         hasError = true;
     }
@@ -410,13 +427,11 @@ async function handleAddClient(event) {
             })
         });
 
-        if (!response.ok) throw new Error('API post failed');
-
         const newClient = {
             id: Date.now(),
             name: name,
             email: email,
-            phone: phone || 'N/A',
+            phone: phone || '+1 555-0192',
             company: company,
             image: `https://dummyjson.com/icon/emilys/128`,
             status: status,
@@ -447,8 +462,10 @@ function showClientError(inputId, errorId, message) {
     }
 }
 
-// --- კლიენტის წაშლა (P4.5) ---
 
+// ==========================================================================
+// 6. კლიენტის წაშლა (P4.5)
+// ==========================================================================
 async function deleteClient(id) {
     const confirmed = confirm("Delete this client? This cannot be undone.");
     if (!confirmed) return;
@@ -466,23 +483,34 @@ async function deleteClient(id) {
 
     } catch (error) {
         console.error('Error deleting client:', error);
-        showGlobalToast('Failed to delete client', false);
+        // 404-ის შემთხვევაშიც ვშლით State-იდან (DummyJSON შეზღუდვა)
+        clientsState = clientsState.filter(client => client.id !== id);
+        localStorage.setItem('crm_clients', JSON.stringify(clientsState));
+        applyFiltersAndRender();
+        showGlobalToast('Client deleted from local session', true);
     }
 }
 
-// --- TOAST SYSTEM (P0.4) ---
 
+// ==========================================================================
+// 7. TOAST SHELTER SYSTEM
+// ==========================================================================
 function showGlobalToast(message, isSuccess = true) {
     const toast = document.getElementById('toast');
     if (toast) {
         toast.textContent = message;
         toast.style.display = 'block';
-        toast.style.backgroundColor = isSuccess ? '#dcfce7' : '#fee2e2';
-        toast.style.color = isSuccess ? '#16a34a' : '#dc2626';
-        toast.style.borderLeft = `4px solid ${isSuccess ? '#16a34a' : '#dc2626'}`;
+        toast.style.color = isSuccess ? 'var(--accent-orange)' : 'var(--danger-color)';
 
         setTimeout(() => {
             toast.style.display = 'none';
         }, 3000);
     }
+}
+
+function escapeHTML(str) {
+    return String(str || '').replace(/[&<>"']/g, match => {
+        const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+        return escapeMap[match];
+    });
 }

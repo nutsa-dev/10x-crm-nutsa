@@ -1,5 +1,6 @@
 /**
- * 10X CRM - Profile Management (Day 5 - FULL - P5)
+ * 10X CRM - Profile Management Controller (P5 - FULL)
+ * პასუხისმგებელია პროფილის მონაცემების გამოჩენაზე, რედაქტირებაზე, პაროლის შეცვლასა და CRM Data Reset-ზე.
  */
 
 document.addEventListener('DOMContentLoaded', initProfile);
@@ -7,46 +8,64 @@ document.addEventListener('DOMContentLoaded', initProfile);
 let currentUser = null;
 
 function initProfile() {
-    const session = JSON.parse(localStorage.getItem('crm_session'));
-    if (!session) {
+    // 1. სესიის შემოწმება
+    const sessionData = localStorage.getItem('crm_session');
+    if (!sessionData) {
         window.location.href = 'index.html';
         return;
     }
 
-    const users = JSON.parse(localStorage.getItem('crm_users')) || [];
-    currentUser = users.find(u => u.email === session.email);
+    const session = JSON.parse(sessionData);
+    const users = JSON.parse(localStorage.getItem('crm_users') || '[]');
+    
+    // მიმდინარე მომხმარებლის პოვნა ბაზაში
+    currentUser = users.find(u => u.email === session.email || u.id === session.userId);
 
     if (!currentUser) {
         window.location.href = 'index.html';
         return;
     }
 
-    // 1. პროფილის საწყისი რენდერი (P5.1)
+    // 2. პროფილის საწყისი რენდერი (P5.1)
     renderProfileHeader();
 
-    // 2. ფორმების შევსება
-    document.getElementById('editFullName').value = currentUser.fullName;
-    document.getElementById('editCompany').value = currentUser.company || '';
+    // 3. ინპუტების შევსება არსებული მონაცემებით
+    const nameInput = document.getElementById('editFullName');
+    const companyInput = document.getElementById('editCompany');
+    if (nameInput) nameInput.value = currentUser.fullName || '';
+    if (companyInput) companyInput.value = currentUser.company || '';
 
-    // ივენთების მიბმა
-    document.getElementById('editProfileForm').addEventListener('submit', handleProfileUpdate);
-    document.getElementById('changePasswordForm').addEventListener('submit', handlePasswordChange);
+    // 4. ივენთების მიბმა ფორმებზე
+    document.getElementById('editProfileForm')?.addEventListener('submit', handleProfileUpdate);
+    document.getElementById('changePasswordForm')?.addEventListener('submit', handlePasswordChange);
 }
 
-// ანიციალების და თარიღის დახატვა (P5.1)
+// ==========================================================================
+// 1. პროფილის ჰედერის რენდერინგი (P5.1)
+// ==========================================================================
 function renderProfileHeader() {
-    const initials = currentUser.fullName
-        .split(' ')
-        .map(n => n[0])
-        .join('')
-        .toUpperCase();
+    // ინიციალების გამოთვლა (მაგ: Nutsa Beridze -> NB)
+    const names = (currentUser.fullName || 'User Name').trim().split(' ');
+    const initials = names.length > 1 
+        ? `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase()
+        : `${names[0][0] || 'U'}`.toUpperCase();
 
-    document.getElementById('profInitials').textContent = initials;
-    document.getElementById('profName').textContent = currentUser.fullName;
-    document.getElementById('profEmail').textContent = currentUser.email;
+    // DOM ელემენტების განახლება (HTML-ის ID-ებთან სრულ სინქრონში)
+    const initialsEl = document.getElementById('profileInitials');
+    const nameEl = document.getElementById('profileFullName');
+    const emailEl = document.getElementById('profileEmail');
+    const metaEl = document.getElementById('profileMeta');
 
-    const dateFormatted = new Date(currentUser.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-    document.getElementById('profMeta').textContent = `${currentUser.company || 'Independent'} • Member since ${dateFormatted}`;
+    if (initialsEl) initialsEl.textContent = initials;
+    if (nameEl) nameEl.textContent = currentUser.fullName;
+    if (emailEl) emailEl.textContent = currentUser.email;
+
+    if (metaEl) {
+        const joinDate = currentUser.createdAt 
+            ? new Date(currentUser.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+            : 'Recently';
+        metaEl.textContent = `${currentUser.company || 'Independent LLC'} • Member since ${joinDate}`;
+    }
 }
 
 function clearProfileErrors() {
@@ -56,7 +75,9 @@ function clearProfileErrors() {
     inputs.forEach(input => input.classList.remove('input-error'));
 }
 
-// ა) პროფილის რედაქტირება (P5.2)
+// ==========================================================================
+// 2. პროფილის რედაქტირება (P5.2)
+// ==========================================================================
 function handleProfileUpdate(event) {
     event.preventDefault();
     clearProfileErrors();
@@ -73,24 +94,32 @@ function handleProfileUpdate(event) {
         return;
     }
 
-    // ბაზაში მომხმარებლის განახლება
-    let users = JSON.parse(localStorage.getItem('crm_users')) || [];
+    // ა) განახლება crm_users-ში
+    let users = JSON.parse(localStorage.getItem('crm_users') || '[]');
     users = users.map(u => {
         if (u.email === currentUser.email) {
             return { ...u, fullName: fullName, company: company };
         }
         return u;
     });
-
     localStorage.setItem('crm_users', JSON.stringify(users));
+
+    // ბ) განახლება crm_session-ში (რომ დეშბორდზეც ახალი სახელი გამოჩნდეს)
+    const session = JSON.parse(localStorage.getItem('crm_session') || '{}');
+    session.fullName = fullName;
+    localStorage.setItem('crm_session', JSON.stringify(session));
+
+    // გ) ლოკალური ობიექტის განახლება
     currentUser.fullName = fullName;
     currentUser.company = company;
 
     renderProfileHeader();
-    showProfileToast('Profile updated ✓', true);
+    showProfileToast('Profile updated successfully ✓', true);
 }
 
-// ბ) პაროლის შეცვლა (P5.3)
+// ==========================================================================
+// 3. პაროლის შეცვლა (P5.3)
+// ==========================================================================
 function handlePasswordChange(event) {
     event.preventDefault();
     clearProfileErrors();
@@ -105,14 +134,14 @@ function handlePasswordChange(event) {
 
     let hasError = false;
 
-    // Current Pass-ის დამთხვევა
+    // 1. Current Pass შემოწმება
     if (currentPass !== currentUser.password) {
         currentPassInput.classList.add('input-error');
         document.getElementById('currentPasswordError').textContent = 'Current password is incorrect';
         hasError = true;
     }
 
-    // ახალი პაროლის წესები (მინ. 8 სიმბოლო, 1 ასო და 1 ციფრი)
+    // 2. ახალი პაროლის ვალიდაცია (მინ. 8 სიმბოლო, 1 ასო, 1 ციფრი)
     const hasLetter = /[a-zA-Z]/.test(newPass);
     const hasDigit = /[0-9]/.test(newPass);
     if (newPass.length < 8 || !hasLetter || !hasDigit) {
@@ -120,13 +149,12 @@ function handlePasswordChange(event) {
         document.getElementById('newPasswordError').textContent = 'Password must be at least 8 characters and contain a letter and a number';
         hasError = true;
     } else if (newPass === currentUser.password) {
-        // არ უნდა ემთხვეოდეს მიმდინარეს
         newPassInput.classList.add('input-error');
-        document.getElementById('newPasswordError').textContent = 'New password must be different from the current one';
+        document.getElementById('newPasswordError').textContent = 'New password must be different from current password';
         hasError = true;
     }
 
-    // Confirm Pass დამთხვევა
+    // 3. Confirm Pass შემოწმება
     if (newPass !== confirmNewPass) {
         confirmNewPassInput.classList.add('input-error');
         document.getElementById('confirmNewPasswordError').textContent = 'Passwords do not match';
@@ -136,7 +164,7 @@ function handlePasswordChange(event) {
     if (hasError) return;
 
     // ბაზაში განახლება
-    let users = JSON.parse(localStorage.getItem('crm_users')) || [];
+    let users = JSON.parse(localStorage.getItem('crm_users') || '[]');
     users = users.map(u => {
         if (u.email === currentUser.email) {
             return { ...u, password: newPass };
@@ -147,33 +175,34 @@ function handlePasswordChange(event) {
     localStorage.setItem('crm_users', JSON.stringify(users));
     currentUser.password = newPass;
 
-    // ფორმის გასუფთავება
     document.getElementById('changePasswordForm').reset();
-    showProfileToast('Password changed ✓', true);
+    showProfileToast('Password changed successfully ✓', true);
 }
 
-// გ) CRM მონაცემთა Reset (P5.4)
+// ==========================================================================
+// 4. CRM მონაცემთა Reset (P5.4)
+// ==========================================================================
 function resetCRMData() {
-    const confirmed = confirm("Are you sure you want to clear all modifications? This will re-fetch the base clients.");
+    const confirmed = confirm("Are you sure you want to clear all client modifications? This will re-fetch the base clients from API.");
     if (!confirmed) return;
 
     localStorage.removeItem('crm_clients');
     showProfileToast('CRM database successfully reset ✓', true);
 
     setTimeout(() => {
-        window.location.href = 'clients.html'; // გადაყვანა კლიენტებზე, სადაც თავიდან ჩაიტვირთება
-    }, 1500);
+        window.location.href = 'clients.html';
+    }, 1200);
 }
 
-// Toast
+// ==========================================================================
+// 5. TOAST NOTIFICATION SYSTEM
+// ==========================================================================
 function showProfileToast(message, isSuccess = true) {
     const toast = document.getElementById('toast');
     if (toast) {
         toast.textContent = message;
         toast.style.display = 'block';
-        toast.style.backgroundColor = isSuccess ? '#dcfce7' : '#fee2e2';
-        toast.style.color = isSuccess ? '#16a34a' : '#dc2626';
-        toast.style.borderLeft = `4px solid ${isSuccess ? '#16a34a' : '#dc2626'}`;
+        toast.style.color = isSuccess ? 'var(--accent-orange)' : 'var(--danger-color)';
 
         setTimeout(() => {
             toast.style.display = 'none';

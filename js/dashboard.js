@@ -64,19 +64,23 @@ function renderDashboardMetrics() {
     const clients = JSON.parse(localStorage.getItem('crm_clients') || '[]');
     const totalClientsCount = clients.length;
 
+    // 1. Total Clients
     document.getElementById('totalClients').textContent = totalClientsCount;
 
+    // 2. Active Deals
     const activeDeals = clients.filter(c => ['Lead', 'Contacted', 'Proposal'].includes(c.status));
     document.getElementById('activeDeals').textContent = activeDeals.length;
 
-    const totalValue = clients.reduce((sum, c) => sum + (parseFloat(c.budget) || parseFloat(c.dealValue) || 0), 0);
+    // 3. Pipeline Value (სწორი dealValue ველის დაჯამება)
+    const totalValue = clients.reduce((sum, c) => sum + (parseFloat(c.dealValue) || parseFloat(c.budget) || 0), 0);
     document.getElementById('totalRevenue').textContent = `$${totalValue.toLocaleString('en-US')}`;
 
+    // 4. Win Rate
     const wonClients = clients.filter(c => c.status === 'Won').length;
     const winRate = totalClientsCount > 0 ? Math.round((wonClients / totalClientsCount) * 100) : 0;
     document.getElementById('conversionRate').textContent = `${winRate}%`;
 
-    // Pipeline რაოდენობები
+    // 5. Pipeline რაოდენობები
     const stageCounts = { Lead: 0, Contacted: 0, Proposal: 0, Won: 0, Lost: 0 };
     clients.forEach(c => {
         if (stageCounts.hasOwnProperty(c.status)) {
@@ -84,21 +88,19 @@ function renderDashboardMetrics() {
         }
     });
 
-    // რიცხვების ჩაწერა
     document.getElementById('countLead').textContent = stageCounts.Lead;
     document.getElementById('countContacted').textContent = stageCounts.Contacted;
     document.getElementById('countProposal').textContent = stageCounts.Proposal;
     document.getElementById('countWon').textContent = stageCounts.Won;
     document.getElementById('countLost').textContent = stageCounts.Lost;
 
-    // 📊 ინფოგრაფიკის პროგრეს-ბარების პროპორციული გამოთვლა %-ებში
-    const maxCount = Math.max(...Object.values(stageCounts), 1); // ნულზე გაყოფის თავიდან ასაცილებლად
-
-    document.getElementById('barLead').style.width = `${(stageCounts.Lead / maxCount) * 100}%`;
-    document.getElementById('barContacted').style.width = `${(stageCounts.Contacted / maxCount) * 100}%`;
-    document.getElementById('barProposal').style.width = `${(stageCounts.Proposal / maxCount) * 100}%`;
-    document.getElementById('barWon').style.width = `${(stageCounts.Won / maxCount) * 100}%`;
-    document.getElementById('barLost').style.width = `${(stageCounts.Lost / maxCount) * 100}%`;
+    // პროგრეს-ბარების პროპორციული გამოთვლა
+    const maxCount = Math.max(...Object.values(stageCounts), 1);
+    if (document.getElementById('barLead')) document.getElementById('barLead').style.width = `${(stageCounts.Lead / maxCount) * 100}%`;
+    if (document.getElementById('barContacted')) document.getElementById('barContacted').style.width = `${(stageCounts.Contacted / maxCount) * 100}%`;
+    if (document.getElementById('barProposal')) document.getElementById('barProposal').style.width = `${(stageCounts.Proposal / maxCount) * 100}%`;
+    if (document.getElementById('barWon')) document.getElementById('barWon').style.width = `${(stageCounts.Won / maxCount) * 100}%`;
+    if (document.getElementById('barLost')) document.getElementById('barLost').style.width = `${(stageCounts.Lost / maxCount) * 100}%`;
 
     renderRecentClientsTable(clients);
 }
@@ -141,7 +143,7 @@ function renderRecentClientsTable(clients) {
 }
 
 function escapeHTML(str) {
-    return String(str).replace(/[&<>"']/g, match => {
+    return String(str || '').replace(/[&<>"']/g, match => {
         const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
         return escapeMap[match];
     });

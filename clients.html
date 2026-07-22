@@ -2,69 +2,88 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>10X CRM - Clients</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=500;600;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10X CRM - Clients Directory</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+
     <script src="js/guard.js"></script>
+    <script src="js/theme.js"></script>
 </head>
 <body class="app-body">
 
-    <div class="sidebar">
-        <div>
-            <div class="logo" style="cursor: pointer;" onclick="window.location.href='dashboard.html'">10X CRM</div>
-            <div class="nav-links">
-                <a href="dashboard.html">Dashboard</a>
-                <a href="clients.html" class="active">Clients</a>
-                <a href="profile.html">Profile</a>
-            </div>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 14px; width: 100%;">
-            <button class="btn-theme-fixed" style="width: 100%; justify-content: center;" onclick="toggleTheme()">🌓 Toggle Theme</button>
-            <button type="button" class="btn-logout" onclick="logout()">Log Out</button>
-        </div>
-    </div>
+    <div class="toast" id="toast"></div>
 
-    <div class="main-content">
-        <div class="header-panel" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-            <h1>Clients Base</h1>
-            <button class="btn-submit-glass" style="width: auto; padding: 14px 28px; font-size: 16px;" onclick="openAddClientModal()">+ Add Client</button>
-        </div>
-        
-        <div id="loadingIndicator" class="loading-box" style="display: none;">
-            Loading clients...
-        </div>
-
-        <div class="toolbar" style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: space-between; margin-bottom: 30px; padding: 20px; background: var(--bg-color); border-radius: var(--radius-md); box-shadow: var(--shadow-inset-light), var(--shadow-inset-dark);">
-            <div style="flex: 1; min-width: 250px;">
-                <input type="text" id="searchInput" class="form-input-neo" placeholder="🔍 Search by name or company..." style="padding: 14px 20px; font-size: 16px;">
+    <header class="app-header">
+        <div class="header-container">
+            <div class="brand">
+                <span class="brand-logo">10X</span>
+                <span class="brand-title">CRM</span>
             </div>
 
-            <div class="filter-chips" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button class="chip active" data-status="All" onclick="filterByStatus('All')">All</button>
-                <button class="chip" data-status="Lead" onclick="filterByStatus('Lead')">Lead</button>
-                <button class="chip" data-status="Contacted" onclick="filterByStatus('Contacted')">Contacted</button>
-                <button class="chip" data-status="Won" onclick="filterByStatus('Won')">Won</button>
-                <button class="chip" data-status="Lost" onclick="filterByStatus('Lost')">Lost</button>
-            </div>
+            <nav class="nav-menu">
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+                <a href="clients.html" class="nav-link active">Clients</a>
+                <a href="profile.html" class="nav-link">Profile</a>
+            </nav>
 
-            <div style="min-width: 180px;">
-                <select id="sortSelect" class="form-input-neo" style="padding: 14px 20px; font-size: 16px; cursor: pointer; appearance: none;" onchange="handleSortChange()">
-                    <option value="Newest">Newest first</option>
-                    <option value="Name">Name A -> Z</option>
-                    <option value="DealValue">Deal value: High -> Low</option>
-                </select>
+            <div class="header-actions">
+                <div class="live-clock" id="liveClock">00:00:00 AM</div>
+                <button type="button" class="btn-theme" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle Theme">🌙</button>
+                <button type="button" class="btn-logout" onclick="logout()">Log Out</button>
             </div>
         </div>
+    </header>
 
-        <div id="clientsContainer" class="clients-grid">
+    <main class="main-content">
+        <div class="container">
+            
+            <div class="page-header-bar">
+                <div>
+                    <h1>Clients Directory</h1>
+                    <p class="subtitle">Manage, filter, and track all your active business leads</p>
+                </div>
+                <button type="button" class="btn-submit-glass btn-add-client" onclick="openAddClientModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Add New Client
+                </button>
             </div>
-    </div>
+
+            <div class="toolbar">
+                <div class="search-box-wrapper">
+                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="searchInput" class="form-input-neo search-input" placeholder="Search by client name, company or email...">
+                </div>
+
+                <div class="filter-chips">
+                    <button class="chip active" data-status="All" onclick="filterByStatus('All')">All</button>
+                    <button class="chip" data-status="Lead" onclick="filterByStatus('Lead')">Lead</button>
+                    <button class="chip" data-status="Contacted" onclick="filterByStatus('Contacted')">Contacted</button>
+                    <button class="chip" data-status="Proposal" onclick="filterByStatus('Proposal')">Proposal</button>
+                    <button class="chip" data-status="Won" onclick="filterByStatus('Won')">Won</button>
+                    <button class="chip" data-status="Lost" onclick="filterByStatus('Lost')">Lost</button>
+                </div>
+
+                <div class="sort-wrapper">
+                    <select id="sortSelect" class="form-input-neo sort-select" onchange="handleSortChange()">
+                        <option value="Newest">Newest first</option>
+                        <option value="Name">Name A -> Z</option>
+                        <option value="DealValue">Deal value: High -> Low</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="clientsContainer" class="clients-grid"></div>
+
+        </div>
+    </main>
 
     <div class="modal-overlay" id="addClientModal" style="display: none;">
         <div class="card modal-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                <h2 style="margin: 0; text-align: left; font-size: 28px;">Add New Client</h2>
-                <button class="btn-logout" style="padding: 8px 14px; font-size: 14px; margin: 0;" onclick="closeAddClientModal()">X</button>
+            <div class="modal-header">
+                <h2>Add New Client</h2>
+                <button type="button" class="btn-close-modal" onclick="closeAddClientModal()">✕</button>
             </div>
             
             <form id="addClientForm" novalidate>
@@ -74,17 +93,17 @@
                     <div class="error-text" id="clientNameError"></div>
                 </div>
                 <div class="form-group">
-                    <label>Email</label>
+                    <label>Email Address</label>
                     <input type="email" id="clientEmail" class="form-input-neo" placeholder="e.g. john@example.com">
                     <div class="error-text" id="clientEmailError"></div>
                 </div>
                 <div class="form-group">
-                    <label>Phone (optional)</label>
-                    <input type="text" id="clientPhone" class="form-input-neo" placeholder="e.g. +995 555 12 34 56">
+                    <label>Phone Number (optional)</label>
+                    <input type="text" id="clientPhone" class="form-input-neo" placeholder="e.g. +1 555-0192">
                     <div class="error-text" id="clientPhoneError"></div>
                 </div>
                 <div class="form-group">
-                    <label>Company</label>
+                    <label>Company Name</label>
                     <input type="text" id="clientCompany" class="form-input-neo" placeholder="e.g. Acme Corp">
                     <div class="error-text" id="clientCompanyError"></div>
                 </div>
@@ -94,71 +113,69 @@
                     <div class="error-text" id="clientDealValueError"></div>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
-                    <select id="clientStatus" class="form-input-neo" style="appearance: none; cursor: pointer;">
+                    <label>Pipeline Status</label>
+                    <select id="clientStatus" class="form-input-neo custom-select">
                         <option value="Lead" selected>Lead</option>
                         <option value="Contacted">Contacted</option>
+                        <option value="Proposal">Proposal</option>
                         <option value="Won">Won</option>
                         <option value="Lost">Lost</option>
                     </select>
                 </div>
-                <button type="submit" class="btn-submit-glass" style="margin-top: 10px;">Create Client</button>
+                <button type="submit" class="btn-submit-glass">Create Client</button>
             </form>
         </div>
     </div>
 
     <div class="modal-overlay" id="clientDetailsModal" style="display: none;">
-        <div class="card modal-card" style="max-width: 650px !important;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <h2 style="margin: 0; text-align: left; font-size: 28px;">Client Details</h2>
-                <button class="btn-logout" style="padding: 8px 14px; font-size: 14px; margin: 0;" onclick="closeDetailsModal()">X</button>
+        <div class="card modal-card modal-card-wide">
+            <div class="modal-header">
+                <h2>Client Details</h2>
+                <button type="button" class="btn-close-modal" onclick="closeDetailsModal()">✕</button>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 24px; padding: 16px; background: var(--bg-color); border-radius: var(--radius-md); box-shadow: var(--shadow-inset-light), var(--shadow-inset-dark);">
-                <img src="" id="detAvatar" style="width: 80px; height: 80px; border-radius: 50%; box-shadow: var(--shadow-light), var(--shadow-dark);">
+            <div class="details-profile-banner">
+                <img src="" id="detAvatar" class="details-avatar" alt="Client Avatar">
                 <div>
-                    <h3 id="detName" style="font-size: 22px; font-weight: 800;"></h3>
-                    <p id="detCompany" style="font-weight: 700; color: var(--text-muted);"></p>
-                    <p id="detMeta" style="font-size: 13px; font-weight: 600; color: var(--text-muted); margin-top: 4px;"></p>
+                    <h3 id="detName" class="details-name"></h3>
+                    <p id="detCompany" class="details-company"></p>
+                    <p id="detMeta" class="details-meta"></p>
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
-                <div class="client-detail-item" style="flex-direction: column; align-items: flex-start; gap: 4px;">
-                    <span style="font-size: 13px;">Email Address</span>
-                    <strong id="detEmail" style="font-size: 15px;"></strong>
+            <div class="details-info-grid">
+                <div class="info-item">
+                    <span class="info-label">Email Address</span>
+                    <strong id="detEmail" class="info-value"></strong>
                 </div>
-                <div class="client-detail-item" style="flex-direction: column; align-items: flex-start; gap: 4px;">
-                    <span style="font-size: 13px;">Phone Number</span>
-                    <strong id="detPhone" style="font-size: 15px;"></strong>
-                </div>
-            </div>
-
-            <div style="margin-bottom: 24px;">
-                <h4 style="font-size: 16px; font-weight: 800; margin-bottom: 12px;">Notes History</h4>
-                <div id="notesContainer" style="max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; padding: 10px; background: var(--bg-color); border-radius: var(--radius-md); box-shadow: var(--shadow-inset-light), var(--shadow-inset-dark);">
-                    </div>
-                <div style="display: flex; gap: 12px;">
-                    <input type="text" id="newNoteInput" class="form-input-neo" placeholder="Write a note..." style="padding: 12px 18px; font-size: 15px; flex: 1;">
-                    <button class="btn-submit-glass" id="addNoteBtn" style="width: auto; padding: 12px 24px; font-size: 15px;">Add Note</button>
+                <div class="info-item">
+                    <span class="info-label">Phone Number</span>
+                    <strong id="detPhone" class="info-value"></strong>
                 </div>
             </div>
 
-            <button class="btn-theme-fixed" id="remindBtn" style="width: 100%; justify-content: center; border-radius: var(--radius-md);" onclick="setOneMinReminder()">
-                🔔 Remind me in 1 min
+            <div class="notes-section">
+                <h4>Notes History</h4>
+                <div id="notesContainer" class="notes-list-box"></div>
+                <div class="add-note-row">
+                    <input type="text" id="newNoteInput" class="form-input-neo note-input" placeholder="Write a note or call record...">
+                    <button type="button" class="btn-submit-glass btn-add-note" id="addNoteBtn">Add Note</button>
+                </div>
+            </div>
+
+            <button type="button" class="btn-reminder" id="remindBtn" onclick="setOneMinReminder()">
+                🔔 Remind me in 1 min (Follow-up)
             </button>
         </div>
     </div>
 
-    <div class="toast" id="toast"></div>
-
     <script src="js/auth.js"></script>
-    <script src="js/theme.js"></script>
     <script src="js/clients.js"></script>
     <script>
-        initClients();
-        // ფორმის გაგზავნის ივენთის მიბმა
-        document.getElementById('addClientForm').addEventListener('submit', handleAddClient);
+        document.addEventListener('DOMContentLoaded', () => {
+            initClients();
+            document.getElementById('addClientForm').addEventListener('submit', handleAddClient);
+        });
     </script>
 </body>
 </html>
