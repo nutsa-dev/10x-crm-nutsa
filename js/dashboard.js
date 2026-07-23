@@ -11,20 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 1. Clock and date initialization in greeting section
 function initClock() {
-    const clockElement = document.getElementById('liveClock');
     const dateElement = document.getElementById('currentDate');
 
     function updateTime() {
         const now = new Date();
-
-        if (clockElement) {
-            clockElement.textContent = now.toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: true
-            });
-        }
 
         if (dateElement) {
             dateElement.textContent = now.toLocaleDateString('en-US', {
@@ -133,20 +123,24 @@ function drawPipelineChart(stageCounts) {
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
     const radius = Math.min(centerX, centerY) - 20;
-    const innerRadius = radius * 0.6;
+    const innerRadius = radius * 0.65;
     
     if (total === 0) {
         ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-        ctx.strokeStyle = '#d1d9e6';
+        ctx.arc(centerX, centerY, (radius + innerRadius) / 2, 0, 2 * Math.PI);
+        ctx.strokeStyle = '#e2e8f0';
         ctx.lineWidth = radius - innerRadius;
         ctx.stroke();
         
-        ctx.font = 'bold 16px Inter, sans-serif';
-        ctx.fillStyle = '#636e72';
+        ctx.font = 'bold 24px Inter, sans-serif';
+        ctx.fillStyle = document.body.classList.contains('dark-mode') ? '#f1f3f7' : '#2d3436';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('No Clients', centerX, centerY);
+        ctx.fillText('0', centerX, centerY - 10);
+        
+        ctx.font = '600 12px Inter, sans-serif';
+        ctx.fillStyle = '#828a99';
+        ctx.fillText('Total Clients', centerX, centerY + 15);
         return;
     }
     
@@ -161,6 +155,24 @@ function drawPipelineChart(stageCounts) {
         ctx.arc(centerX, centerY, (radius + innerRadius) / 2, startAngle, startAngle + sliceAngle);
         ctx.strokeStyle = stage.color;
         ctx.lineWidth = radius - innerRadius;
+        ctx.stroke();
+        
+        // Draw slice divider borders at both start and end of the segment to guarantee equal separation
+        const isDark = document.body.classList.contains('dark-mode');
+        const borderColor = isDark ? '#1e293b' : '#f1f5f9';
+        
+        ctx.beginPath();
+        ctx.moveTo(centerX + innerRadius * Math.cos(startAngle), centerY + innerRadius * Math.sin(startAngle));
+        ctx.lineTo(centerX + radius * Math.cos(startAngle), centerY + radius * Math.sin(startAngle));
+        ctx.strokeStyle = borderColor;
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(centerX + innerRadius * Math.cos(startAngle + sliceAngle), centerY + innerRadius * Math.sin(startAngle + sliceAngle));
+        ctx.lineTo(centerX + radius * Math.cos(startAngle + sliceAngle), centerY + radius * Math.sin(startAngle + sliceAngle));
+        ctx.strokeStyle = borderColor;
+        ctx.lineWidth = 4;
         ctx.stroke();
         
         startAngle += sliceAngle;

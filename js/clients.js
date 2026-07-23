@@ -248,11 +248,14 @@ function renderClients(clients) {
 
     container.innerHTML = '';
 
-    clients.forEach(client => {
+    // Play soft pop sound on grid layout load
+    if (typeof playASMRPop === 'function') playASMRPop();
+
+    clients.forEach((client, index) => {
         const dealFormatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(client.dealValue || 0);
 
         const cardHTML = `
-            <div class="client-card" data-id="${client.id}" onclick="openDetailsModal(${client.id})">
+            <div class="client-card" style="animation-delay: ${index * 0.05}s;" data-id="${client.id}" onclick="openDetailsModal(${client.id})">
                 <div class="client-card-header">
                     <img src="${escapeHTML(client.image)}" alt="${escapeHTML(client.name)}" class="client-avatar" onerror="this.src='https://dummyjson.com/icon/emilys/128'">
                     <div class="client-title-info">
@@ -295,6 +298,7 @@ function renderClients(clients) {
 }
 
 function updateClientStatus(id, newStatus) {
+    if (typeof playASMRPop === 'function') playASMRPop();
     clientsState = clientsState.map(client => client.id === id ? { ...client, status: newStatus } : client);
     Storage.set(STORAGE_KEYS.CLIENTS, clientsState);
     applyFiltersAndRender();
@@ -308,6 +312,7 @@ let callInterval = null;
 let callSeconds = 0;
 
 function openDetailsModal(id) {
+    if (typeof playASMRPop === 'function') playASMRPop();
     const client = clientsState.find(c => c.id === id);
     if (!client) return;
 
@@ -352,6 +357,7 @@ function closeDetailsModal() {
 }
 
 function startCall() {
+    if (typeof playASMRPop === 'function') playASMRPop();
     callSeconds = 0;
     const startBtn = document.getElementById('startCallBtn');
     const endBtn = document.getElementById('endCallBtn');
@@ -371,6 +377,7 @@ function startCall() {
 }
 
 function endCall() {
+    if (typeof playASMRPop === 'function') playASMRPop();
     clearInterval(callInterval);
     callInterval = null;
     
@@ -425,6 +432,7 @@ function renderNotes(notes) {
 }
 
 function handleAddNote() {
+    if (typeof playASMRPop === 'function') playASMRPop();
     const input = document.getElementById('newNoteInput');
     const text = input.value.trim();
     if (!text) return;
@@ -701,6 +709,7 @@ function escapeHTML(str) {
 
 // Kanban drag & drop and view toggle logic
 function switchView(view) {
+    if (typeof playASMRPop === 'function') playASMRPop();
     currentView = view;
     const gridBtn = document.getElementById('viewToggleGrid');
     const kanbanBtn = document.getElementById('viewToggleKanban');

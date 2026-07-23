@@ -3,6 +3,14 @@
  * Manages theme application, theme toggling, and updating the global header clock.
  */
 
+// Avoid initial transitions on page load
+document.documentElement.classList.add('no-transitions');
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        document.documentElement.classList.remove('no-transitions');
+    }, 100);
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     applyStoredTheme();
     initGlobalClock();
@@ -43,6 +51,7 @@ function applyStoredTheme() {
 
 // 3. Toggle dark/light mode
 function toggleTheme() {
+    playASMRPop();
     const isDark = document.body.classList.toggle('dark-mode');
     const newTheme = isDark ? 'dark' : 'light';
     
@@ -62,3 +71,30 @@ function toggleTheme() {
 
 // Make globally available for backward-compatibility with inline HTML events
 window.toggleTheme = toggleTheme;
+
+// Web Audio API ASMR Click Pop Feedback
+function playASMRPop() {
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(180, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(60, ctx.currentTime + 0.05);
+        
+        gain.gain.setValueAtTime(0.015, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+        
+        osc.start();
+        osc.stop(ctx.currentTime + 0.05);
+    } catch (e) {
+        // AudioContext browser permission block
+    }
+}
+window.playASMRPop = playASMRPop;
