@@ -57,12 +57,38 @@ body.dark-mode {
     -moz-osx-font-smoothing: grayscale;
 }
 
+html {
+    scrollbar-gutter: stable;
+}
+
 html, body {
     min-height: 100vh;
     background-color: var(--bg-color) !important;
     color: var(--text-main);
     font-size: 19px;
     line-height: 1.5;
+    overflow-x: hidden;
+}
+
+/* Custom Neumorphic Scrollbars */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 20px;
+    border: 2px solid var(--bg-color);
+    transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-orange);
 }
 
 a {
