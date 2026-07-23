@@ -1,25 +1,31 @@
 /**
  * 10X CRM - Clients Management Controller
- * ოქროს ციკლის ლოგიკა: LocalStorage -> API (GET, POST, DELETE) -> Render -> Sync
  */
 
+// ==========================================================================
+// 1. Validation Rules & Constants (Easy to edit during live exam coding!)
+// ==========================================================================
+const CLIENT_RULES = {
+    MIN_NAME_LENGTH: 3,
+    MIN_DEAL_VALUE: 0,
+    EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+};
+
+// Global state variables
 let clientsState = [];
 let currentDetailsClientId = null;
-
-// ფილტრაციის საწყისი მდგომარეობა
 let currentFilterStatus = 'All';
 let currentSearchQuery = '';
 let currentSortOption = 'Newest';
 
 // ==========================================================================
-// 1. ინიციალიზაცია და API-დან წამოღება (P4.2)
+// 2. Initialization and API Sync
 // ==========================================================================
 async function initClients() {
-    initClock(); // Header Clock
-    const localClients = localStorage.getItem('crm_clients');
+    const localClients = Storage.get(STORAGE_KEYS.CLIENTS);
 
     if (localClients) {
-        clientsState = JSON.parse(localClients);
+        clientsState = localClients;
         applyFiltersAndRender();
     } else {
         await fetchClientsFromAPI();
@@ -28,25 +34,7 @@ async function initClients() {
     document.getElementById('searchInput')?.addEventListener('input', handleSearchInput);
 }
 
-// ცოცხალი საათის ფუნქცია Header-ისთვის
-function initClock() {
-    const clockElement = document.getElementById('liveClock');
-    if (!clockElement) return;
-
-    function updateTime() {
-        const now = new Date();
-        clockElement.textContent = now.toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true
-        });
-    }
-    updateTime();
-    setInterval(updateTime, 1000);
-}
-
-// ჩატვირთვა API-დან + Error Handling (P4.2)
+// Fetch initial database of 30 mock clients from server (P4.2)
 async function fetchClientsFromAPI() {
     const container = document.getElementById('clientsContainer');
     if (container) {
@@ -55,10 +43,7 @@ async function fetchClientsFromAPI() {
 
     try {
         const response = await fetch('https://dummyjson.com/users?limit=30');
-        
-        if (!response.ok) {
-            throw new Error('Network response failed');
-        }
+        if (!response.ok) throw new Error('Network error');
 
         const data = await response.json();
         
@@ -71,8 +56,8 @@ async function fetchClientsFromAPI() {
                 name: fullName,
                 phone: user.phone || '+1 555-0192',
                 email: user.email.toLowerCase(),
-                company: user.company ? user.company.name : 'Acme Corporation',
-                image: user.image || `https://dummyjson.com/icon/emilys/128`,
+                company: user.company ? user.company.name : 'Independent LLC',
+                image: user.image || 'https://dummyjson.com/icon/emilys/128',
                 status: 'Lead',
                 dealValue: randomDealValue,
                 notes: [],
@@ -80,7 +65,7 @@ async function fetchClientsFromAPI() {
             };
         });
 
-        localStorage.setItem('crm_clients', JSON.stringify(clientsState));
+        Storage.set(STORAGE_KEYS.CLIENTS, clientsState);
         applyFiltersAndRender();
 
     } catch (error) {
@@ -88,26 +73,25 @@ async function fetchClientsFromAPI() {
         if (container) {
             container.innerHTML = `
                 <div class="error-state-box">
-                    <p>Could not load clients. Check your connection and try again.</p>
+                    <p>Could not load clients. Check your connection.</p>
                     <button class="btn-logout" onclick="fetchClientsFromAPI()">🔄 Retry</button>
                 </div>`;
         }
     }
 }
 
-
 // ==========================================================================
-// 2. ფილტრაცია, ძებნა და სორტირება (P4.7)
+// 3. Search, Filter, and Sort Calculations
 // ==========================================================================
 function getVisibleClients() {
     let result = [...clientsState];
 
-    // ა. ფილტრაცია სტატუსით
+    // Status filter chip selector logic
     if (currentFilterStatus !== 'All') {
         result = result.filter(client => client.status === currentFilterStatus);
     }
 
-    // ბ. ძებნა სახელის, კომპანიის ან მეილის მიხედვით
+    // Search query search logic
     if (currentSearchQuery) {
         const query = currentSearchQuery.toLowerCase();
         result = result.filter(client => 
@@ -117,7 +101,7 @@ function getVisibleClients() {
         );
     }
 
-    // გ. სორტირება
+    // Sorting options execution
     if (currentSortOption === 'Newest') {
         result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     } else if (currentSortOption === 'Name') {
@@ -130,8 +114,7 @@ function getVisibleClients() {
 }
 
 function applyFiltersAndRender() {
-    const visibleClients = getVisibleClients();
-    renderClients(visibleClients);
+    renderClients(getVisibleClients());
 }
 
 function filterByStatus(status) {
@@ -160,16 +143,15 @@ function handleSortChange() {
     }
 }
 
-
 // ==========================================================================
-// 3. ბარათების რენდერინგი DOM-ში (P4.3)
+// 4. Rendering Clients Grid
 // ==========================================================================
 function renderClients(clients) {
     const container = document.getElementById('clientsContainer');
     if (!container) return;
 
     if (clients.length === 0) {
-        container.innerHTML = '<div class="empty-state-box">No clients found matching your search criteria.</div>';
+        container.innerHTML = '<div class="empty-state-box">No clients found matching your search.</div>';
         return;
     }
 
@@ -177,7 +159,6 @@ function renderClients(clients) {
 
     clients.forEach(client => {
         const dealFormatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(client.dealValue || 0);
-        const statusClass = `badge-${(client.status || 'lead').toLowerCase()}`;
 
         const cardHTML = `
             <div class="client-card" data-id="${client.id}" onclick="openDetailsModal(${client.id})">
@@ -205,10 +186,9 @@ function renderClients(clients) {
                 </div>
 
                 <div class="client-card-footer" onclick="event.stopPropagation()">
-                    <select class="select-status-inline ${statusClass}" onchange="updateClientStatus(${client.id}, this.value)">
+                    <select class="select-status-inline" onchange="updateClientStatus(${client.id}, this.value)">
                         <option value="Lead" ${client.status === 'Lead' ? 'selected' : ''}>Lead</option>
                         <option value="Contacted" ${client.status === 'Contacted' ? 'selected' : ''}>Contacted</option>
-                        <option value="Proposal" ${client.status === 'Proposal' ? 'selected' : ''}>Proposal</option>
                         <option value="Won" ${client.status === 'Won' ? 'selected' : ''}>Won</option>
                         <option value="Lost" ${client.status === 'Lost' ? 'selected' : ''}>Lost</option>
                     </select>
@@ -223,21 +203,14 @@ function renderClients(clients) {
 }
 
 function updateClientStatus(id, newStatus) {
-    clientsState = clientsState.map(client => {
-        if (client.id === id) {
-            return { ...client, status: newStatus };
-        }
-        return client;
-    });
-
-    localStorage.setItem('crm_clients', JSON.stringify(clientsState));
+    clientsState = clientsState.map(client => client.id === id ? { ...client, status: newStatus } : client);
+    Storage.set(STORAGE_KEYS.CLIENTS, clientsState);
     applyFiltersAndRender();
-    showGlobalToast(`Status updated to ${newStatus} ✓`, true);
+    showToast(`Status updated to ${newStatus} ✓`, true);
 }
 
-
 // ==========================================================================
-// 4. კლიენტის დეტალების მოდალი და შენიშვნები (P4.8)
+// 5. Client Details Modal (P4.8)
 // ==========================================================================
 function openDetailsModal(id) {
     const client = clientsState.find(c => c.id === id);
@@ -258,11 +231,10 @@ function openDetailsModal(id) {
     document.getElementById('detMeta').textContent = `${client.status} • Client since ${dateFormatted}`;
 
     renderNotes(client.notes);
-
     document.getElementById('clientDetailsModal').style.display = 'flex';
 
     const addNoteBtn = document.getElementById('addNoteBtn');
-    addNoteBtn.onclick = handleAddNote;
+    if (addNoteBtn) addNoteBtn.onclick = handleAddNote;
 }
 
 function closeDetailsModal() {
@@ -295,7 +267,6 @@ function renderNotes(notes) {
 function handleAddNote() {
     const input = document.getElementById('newNoteInput');
     const text = input.value.trim();
-
     if (!text) return;
 
     clientsState = clientsState.map(client => {
@@ -310,22 +281,22 @@ function handleAddNote() {
         return client;
     });
 
-    localStorage.setItem('crm_clients', JSON.stringify(clientsState));
-    
+    Storage.set(STORAGE_KEYS.CLIENTS, clientsState);
     const updatedClient = clientsState.find(c => c.id === currentDetailsClientId);
     renderNotes(updatedClient.notes);
     input.value = '';
 }
 
+// 1-minute timeout reminder
 function setOneMinReminder() {
     const client = clientsState.find(c => c.id === currentDetailsClientId);
     if (!client) return;
 
-    showGlobalToast('Reminder set ✓', true);
+    showToast('Reminder set ✓', true);
     closeDetailsModal();
 
     setTimeout(() => {
-        showGlobalToast(`🔔 Follow up: ${client.name}`, true);
+        showToast(`🔔 Follow up: ${client.name}`, true);
     }, 60000);
 }
 
@@ -333,9 +304,8 @@ document.getElementById('clientDetailsModal')?.addEventListener('click', functio
     if (event.target === this) closeDetailsModal();
 });
 
-
 // ==========================================================================
-// 5. ახალი კლიენტის დამატების მოდალი (P4.4, P4.5)
+// 6. Add Client Modal (P4.4)
 // ==========================================================================
 function openAddClientModal() {
     const modal = document.getElementById('addClientModal');
@@ -360,13 +330,11 @@ document.getElementById('addClientModal')?.addEventListener('click', function(ev
 function clearClientFormErrors() {
     const form = document.getElementById('addClientForm');
     if (!form) return;
-    const errorTexts = form.querySelectorAll('.error-text');
-    errorTexts.forEach(el => el.textContent = '');
-    
-    const inputs = form.querySelectorAll('.form-input-neo');
-    inputs.forEach(input => input.classList.remove('input-error'));
+    form.querySelectorAll('.error-text').forEach(el => el.textContent = '');
+    form.querySelectorAll('.form-input-neo').forEach(input => input.classList.remove('input-error'));
 }
 
+// Send POST request on client creation as required by PRD
 async function handleAddClient(event) {
     event.preventDefault();
     clearClientFormErrors();
@@ -380,60 +348,67 @@ async function handleAddClient(event) {
 
     let hasError = false;
 
-    if (name.length < 3) {
-        showClientError('clientName', 'clientNameError', 'Name must be at least 3 characters');
+    // Full name validation
+    if (name.length < CLIENT_RULES.MIN_NAME_LENGTH) {
+        showClientError('clientName', 'clientNameError', `Name must be at least ${CLIENT_RULES.MIN_NAME_LENGTH} characters`);
         hasError = true;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    // Email format validation
+    if (!CLIENT_RULES.EMAIL_REGEX.test(email)) {
         showClientError('clientEmail', 'clientEmailError', 'Please enter a valid email address');
         hasError = true;
-    } else {
-        const emailExists = clientsState.some(c => c.email.toLowerCase() === email);
-        if (emailExists) {
-            showClientError('clientEmail', 'clientEmailError', 'A client with this email already exists');
-            hasError = true;
-        }
     }
 
-    if (phone.length > 0 && phone.length < 6) {
-        showClientError('clientPhone', 'clientPhoneError', 'Phone number looks too short');
+    // Duplicate email verification in Local Database
+    if (clientsState.some(c => c.email.toLowerCase() === email)) {
+        showClientError('clientEmail', 'clientEmailError', 'A client with this email already exists');
         hasError = true;
     }
 
+    // Company validation
     if (!company) {
         showClientError('clientCompany', 'clientCompanyError', 'Company name is required');
         hasError = true;
     }
 
-    if (isNaN(dealValue) || dealValue <= 0) {
+    // Deal value validation
+    if (isNaN(dealValue) || dealValue <= CLIENT_RULES.MIN_DEAL_VALUE) {
         showClientError('clientDealValue', 'clientDealValueError', 'Deal value must be a positive number');
         hasError = true;
     }
 
     if (hasError) return;
 
+    const firstName = name.split(' ')[0] || name;
+    const lastName = name.split(' ').slice(1).join(' ') || '';
+
     try {
+        // Send POST request (PRD Requirement)
         const response = await fetch('https://dummyjson.com/users/add', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                firstName: name.split(' ')[0],
-                lastName: name.split(' ')[1] || '',
+                firstName: firstName,
+                lastName: lastName,
                 email: email,
                 phone: phone,
                 company: { name: company }
             })
         });
 
+        if (!response.ok) throw new Error('API server returned error on client add');
+
+        const serverUser = await response.json();
+
+        // Construct new client object using API server user template, prepend to database
         const newClient = {
-            id: Date.now(),
+            id: Date.now(), // Ensure unique id for local storage
             name: name,
             email: email,
             phone: phone || '+1 555-0192',
             company: company,
-            image: `https://dummyjson.com/icon/emilys/128`,
+            image: serverUser.image || 'https://dummyjson.com/icon/emilys/128',
             status: status,
             dealValue: dealValue,
             notes: [],
@@ -441,15 +416,14 @@ async function handleAddClient(event) {
         };
 
         clientsState.unshift(newClient);
-        localStorage.setItem('crm_clients', JSON.stringify(clientsState));
-        
+        Storage.set(STORAGE_KEYS.CLIENTS, clientsState);
         applyFiltersAndRender();
         closeAddClientModal();
-        showGlobalToast('Client added successfully ✓', true);
+        showToast('Client added successfully ✓', true);
 
-    } catch (error) {
-        console.error('Error adding client:', error);
-        showGlobalToast('Could not save client. Try again.', false);
+    } catch (err) {
+        console.error("API error adding client:", err);
+        showToast('Could not register client on the server. Try again.', false);
     }
 }
 
@@ -462,52 +436,34 @@ function showClientError(inputId, errorId, message) {
     }
 }
 
-
-// ==========================================================================
-// 6. კლიენტის წაშლა (P4.5)
-// ==========================================================================
+// Send DELETE request on client removal as required by PRD
 async function deleteClient(id) {
-    const confirmed = confirm("Delete this client? This cannot be undone.");
-    if (!confirmed) return;
+    if (!confirm("Delete this client? This cannot be undone.")) return;
 
     try {
-        await fetch(`https://dummyjson.com/users/${id}`, {
+        // Send DELETE request (PRD Requirement)
+        const response = await fetch(`https://dummyjson.com/users/${id}`, {
             method: 'DELETE'
         });
 
-        clientsState = clientsState.filter(client => client.id !== id);
-        localStorage.setItem('crm_clients', JSON.stringify(clientsState));
-        
-        applyFiltersAndRender();
-        showGlobalToast('Client deleted', true);
-
-    } catch (error) {
-        console.error('Error deleting client:', error);
-        // 404-ის შემთხვევაშიც ვშლით State-იდან (DummyJSON შეზღუდვა)
-        clientsState = clientsState.filter(client => client.id !== id);
-        localStorage.setItem('crm_clients', JSON.stringify(clientsState));
-        applyFiltersAndRender();
-        showGlobalToast('Client deleted from local session', true);
+        // 404 is allowed because locally created users do not exist on the DummyJSON server
+        if (!response.ok && response.status !== 404) {
+            throw new Error('API server returned error on client delete');
+        }
+    } catch (err) {
+        console.error("API error deleting client:", err);
     }
+
+    // Always delete locally and update UI
+    clientsState = clientsState.filter(client => client.id !== id);
+    Storage.set(STORAGE_KEYS.CLIENTS, clientsState);
+    applyFiltersAndRender();
+    showToast('Client deleted', true);
 }
 
-
 // ==========================================================================
-// 7. TOAST SHELTER SYSTEM
+// 7. Security and Escaping
 // ==========================================================================
-function showGlobalToast(message, isSuccess = true) {
-    const toast = document.getElementById('toast');
-    if (toast) {
-        toast.textContent = message;
-        toast.style.display = 'block';
-        toast.style.color = isSuccess ? 'var(--accent-orange)' : 'var(--danger-color)';
-
-        setTimeout(() => {
-            toast.style.display = 'none';
-        }, 3000);
-    }
-}
-
 function escapeHTML(str) {
     return String(str || '').replace(/[&<>"']/g, match => {
         const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };

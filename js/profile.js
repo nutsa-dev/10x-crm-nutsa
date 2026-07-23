@@ -1,24 +1,35 @@
 /**
  * 10X CRM - Profile Management Controller (P5 - FULL)
- * პასუხისმგებელია პროფილის მონაცემების გამოჩენაზე, რედაქტირებაზე, პაროლის შეცვლასა და CRM Data Reset-ზე.
+ * Handles viewing/editing user details, modifying account passwords, and clearing CRM databases.
  */
 
 document.addEventListener('DOMContentLoaded', initProfile);
 
+// ==========================================================================
+// 1. Validation Rules & Constants (Easy to edit during live exam coding!)
+// ==========================================================================
+const PROFILE_RULES = {
+    MIN_NAME_LENGTH: 3,
+    MIN_PASSWORD_LENGTH: 8
+};
+
+// Global state holding current active user structure
 let currentUser = null;
 
+// ==========================================================================
+// 2. Initialization and UI rendering
+// ==========================================================================
 function initProfile() {
-    // 1. სესიის შემოწმება
-    const sessionData = localStorage.getItem('crm_session');
-    if (!sessionData) {
+    // 2.1. Verify session exists
+    const session = Storage.get(STORAGE_KEYS.SESSION);
+    if (!session) {
         window.location.href = 'index.html';
         return;
     }
 
-    const session = JSON.parse(sessionData);
-    const users = JSON.parse(localStorage.getItem('crm_users') || '[]');
+    const users = Storage.get(STORAGE_KEYS.USERS, []);
     
-    // მიმდინარე მომხმარებლის პოვნა ბაზაში
+    // Find active user profile from database
     currentUser = users.find(u => u.email === session.email || u.id === session.userId);
 
     if (!currentUser) {
@@ -26,31 +37,27 @@ function initProfile() {
         return;
     }
 
-    // 2. პროფილის საწყისი რენდერი (P5.1)
+    // 2.2. Render user metadata and avatar (P5.1)
     renderProfileHeader();
 
-    // 3. ინპუტების შევსება არსებული მონაცემებით
+    // 2.3. Pre-fill form inputs with active user values
     const nameInput = document.getElementById('editFullName');
     const companyInput = document.getElementById('editCompany');
     if (nameInput) nameInput.value = currentUser.fullName || '';
     if (companyInput) companyInput.value = currentUser.company || '';
 
-    // 4. ივენთების მიბმა ფორმებზე
+    // 2.4. Bind Event Listeners dynamically
     document.getElementById('editProfileForm')?.addEventListener('submit', handleProfileUpdate);
     document.getElementById('changePasswordForm')?.addEventListener('submit', handlePasswordChange);
 }
 
-// ==========================================================================
-// 1. პროფილის ჰედერის რენდერინგი (P5.1)
-// ==========================================================================
+// Generates initials and loads dynamic join date and company metadata
 function renderProfileHeader() {
-    // ინიციალების გამოთვლა (მაგ: Nutsa Beridze -> NB)
     const names = (currentUser.fullName || 'User Name').trim().split(' ');
     const initials = names.length > 1 
         ? `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase()
         : `${names[0][0] || 'U'}`.toUpperCase();
 
-    // DOM ელემენტების განახლება (HTML-ის ID-ებთან სრულ სინქრონში)
     const initialsEl = document.getElementById('profileInitials');
     const nameEl = document.getElementById('profileFullName');
     const emailEl = document.getElementById('profileEmail');
@@ -68,6 +75,7 @@ function renderProfileHeader() {
     }
 }
 
+// Clears validation visual indicators and alert fields
 function clearProfileErrors() {
     const errorTexts = document.querySelectorAll('.error-text');
     errorTexts.forEach(el => el.textContent = '');
@@ -76,7 +84,7 @@ function clearProfileErrors() {
 }
 
 // ==========================================================================
-// 2. პროფილის რედაქტირება (P5.2)
+// 3. Edit Profile Flow (P5.2)
 // ==========================================================================
 function handleProfileUpdate(event) {
     event.preventDefault();
@@ -88,37 +96,38 @@ function handleProfileUpdate(event) {
     const fullName = nameInput.value.trim();
     const company = companyInput.value.trim();
 
-    if (fullName.length < 3) {
+    // Verify name length
+    if (fullName.length < PROFILE_RULES.MIN_NAME_LENGTH) {
         nameInput.classList.add('input-error');
-        document.getElementById('editFullNameError').textContent = 'Full name must be at least 3 characters';
+        document.getElementById('editFullNameError').textContent = `Full name must be at least ${PROFILE_RULES.MIN_NAME_LENGTH} characters`;
         return;
     }
 
-    // ა) განახლება crm_users-ში
-    let users = JSON.parse(localStorage.getItem('crm_users') || '[]');
+    // 3.1. Update central USERS array in storage
+    let users = Storage.get(STORAGE_KEYS.USERS, []);
     users = users.map(u => {
         if (u.email === currentUser.email) {
             return { ...u, fullName: fullName, company: company };
         }
         return u;
     });
-    localStorage.setItem('crm_users', JSON.stringify(users));
+    Storage.set(STORAGE_KEYS.USERS, users);
 
-    // ბ) განახლება crm_session-ში (რომ დეშბორდზეც ახალი სახელი გამოჩნდეს)
-    const session = JSON.parse(localStorage.getItem('crm_session') || '{}');
+    // 3.2. Update active session storage (keeps greeting name and initials updated on dashboard)
+    const session = Storage.get(STORAGE_KEYS.SESSION) || {};
     session.fullName = fullName;
-    localStorage.setItem('crm_session', JSON.stringify(session));
+    Storage.set(STORAGE_KEYS.SESSION, session);
 
-    // გ) ლოკალური ობიექტის განახლება
+    // 3.3. Update current memory reference and refresh UI view
     currentUser.fullName = fullName;
     currentUser.company = company;
 
     renderProfileHeader();
-    showProfileToast('Profile updated successfully ✓', true);
+    showToast('Profile updated successfully ✓', true);
 }
 
 // ==========================================================================
-// 3. პაროლის შეცვლა (P5.3)
+// 4. Change Password Flow (P5.3)
 // ==========================================================================
 function handlePasswordChange(event) {
     event.preventDefault();
@@ -134,19 +143,19 @@ function handlePasswordChange(event) {
 
     let hasError = false;
 
-    // 1. Current Pass შემოწმება
+    // 4.1. Verify existing password matches current user
     if (currentPass !== currentUser.password) {
         currentPassInput.classList.add('input-error');
         document.getElementById('currentPasswordError').textContent = 'Current password is incorrect';
         hasError = true;
     }
 
-    // 2. ახალი პაროლის ვალიდაცია (მინ. 8 სიმბოლო, 1 ასო, 1 ციფრი)
+    // 4.2. Verify new password meets complexity rules
     const hasLetter = /[a-zA-Z]/.test(newPass);
     const hasDigit = /[0-9]/.test(newPass);
-    if (newPass.length < 8 || !hasLetter || !hasDigit) {
+    if (newPass.length < PROFILE_RULES.MIN_PASSWORD_LENGTH || !hasLetter || !hasDigit) {
         newPassInput.classList.add('input-error');
-        document.getElementById('newPasswordError').textContent = 'Password must be at least 8 characters and contain a letter and a number';
+        document.getElementById('newPasswordError').textContent = `Password must be at least ${PROFILE_RULES.MIN_PASSWORD_LENGTH} characters and contain a letter and a number`;
         hasError = true;
     } else if (newPass === currentUser.password) {
         newPassInput.classList.add('input-error');
@@ -154,7 +163,7 @@ function handlePasswordChange(event) {
         hasError = true;
     }
 
-    // 3. Confirm Pass შემოწმება
+    // 4.3. Verify pass confirm match
     if (newPass !== confirmNewPass) {
         confirmNewPassInput.classList.add('input-error');
         document.getElementById('confirmNewPasswordError').textContent = 'Passwords do not match';
@@ -163,8 +172,8 @@ function handlePasswordChange(event) {
 
     if (hasError) return;
 
-    // ბაზაში განახლება
-    let users = JSON.parse(localStorage.getItem('crm_users') || '[]');
+    // Save password modification to users array
+    let users = Storage.get(STORAGE_KEYS.USERS, []);
     users = users.map(u => {
         if (u.email === currentUser.email) {
             return { ...u, password: newPass };
@@ -172,40 +181,27 @@ function handlePasswordChange(event) {
         return u;
     });
 
-    localStorage.setItem('crm_users', JSON.stringify(users));
+    Storage.set(STORAGE_KEYS.USERS, users);
     currentUser.password = newPass;
 
     document.getElementById('changePasswordForm').reset();
-    showProfileToast('Password changed successfully ✓', true);
+    showToast('Password changed successfully ✓', true);
 }
 
 // ==========================================================================
-// 4. CRM მონაცემთა Reset (P5.4)
+// 5. CRM Data Reset System (P5.4)
 // ==========================================================================
 function resetCRMData() {
     const confirmed = confirm("Are you sure you want to clear all client modifications? This will re-fetch the base clients from API.");
     if (!confirmed) return;
 
-    localStorage.removeItem('crm_clients');
-    showProfileToast('CRM database successfully reset ✓', true);
+    Storage.remove(STORAGE_KEYS.CLIENTS);
+    showToast('CRM database successfully reset ✓', true);
 
     setTimeout(() => {
         window.location.href = 'clients.html';
     }, 1200);
 }
 
-// ==========================================================================
-// 5. TOAST NOTIFICATION SYSTEM
-// ==========================================================================
-function showProfileToast(message, isSuccess = true) {
-    const toast = document.getElementById('toast');
-    if (toast) {
-        toast.textContent = message;
-        toast.style.display = 'block';
-        toast.style.color = isSuccess ? 'var(--accent-orange)' : 'var(--danger-color)';
-
-        setTimeout(() => {
-            toast.style.display = 'none';
-        }, 3000);
-    }
-}
+// Make globally accessible for backward-compatibility with inline HTML click triggers
+window.resetCRMData = resetCRMData;

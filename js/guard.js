@@ -1,38 +1,108 @@
 /**
- * 10X CRM - Auth Guard
- * ეს ფაილი პასუხისმგებელია გვერდების წვდომის კონტროლზე და სესიის დახურვაზე (Logout).
+ * 10X CRM - Auth Guard & Common Utilities
+ * This file is responsible for page route protection, centralized storage helpers,
+ * shared toast notifications, and handling user sessions (Logout).
  */
 
-// 1. ამოწმებს, არის თუ არა მომხმარებელი ავტორიზებული
-function isAuthenticated() {
-    return localStorage.getItem('crm_session') !== null;
+// ==========================================================================
+// 1. Central Storage & Configuration Constants
+// ==========================================================================
+const STORAGE_KEYS = {
+    USERS: 'crm_users',
+    SESSION: 'crm_session',
+    CLIENTS: 'crm_clients',
+    THEME: 'crm_theme'
+};
+
+const Storage = {
+    get(key, defaultValue = null) {
+        try {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : defaultValue;
+        } catch (error) {
+            console.error(`Error reading ${key} from storage:`, error);
+            return defaultValue;
+        }
+    },
+    set(key, value) {
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+        } catch (error) {
+            console.error(`Error saving ${key} to storage:`, error);
+        }
+    },
+    remove(key) {
+        localStorage.removeItem(key);
+    }
+};
+
+// ==========================================================================
+// 2. Centralized Toast Notification System
+// ==========================================================================
+function showToast(message, isSuccess = true) {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+
+    toast.textContent = message;
+    toast.style.color = isSuccess ? 'var(--accent-orange)' : 'var(--danger-color)';
+    toast.style.display = 'block';
+
+    // Clear previous timeout if user triggers multiple toasts in sequence
+    if (window.toastTimeout) {
+        clearTimeout(window.toastTimeout);
+    }
+    
+    window.toastTimeout = setTimeout(() => {
+        toast.style.display = 'none';
+    }, 3000);
 }
 
-// 2. დაცული გვერდების მცველი (dashboard, clients, profile)
+// Ensure other files can call it easily under different names temporarily
+window.showToast = showToast;
+window.showGlobalToast = showToast;
+window.showProfileToast = showToast;
+
+// ==========================================================================
+// 3. Routing & Authentication Guard
+// ==========================================================================
+function isAuthenticated() {
+    return Storage.get(STORAGE_KEYS.SESSION) !== null;
+}
+
+// Keep functions globally accessible
+window.isAuthenticated = isAuthenticated;
+
 function checkAuthForProtectedRoute() {
     if (!isAuthenticated()) {
-        window.location.href = 'index.html'; // თუ სესია არ არის -> გადამისამართება ლოგინზე
+        window.location.href = 'index.html'; // Redirect to login if not authenticated
     }
 }
 
-// 3. საჯარო გვერდების მცველი (login, signup, forgot-password)
 function checkAuthForPublicPage() {
     if (isAuthenticated()) {
-        window.location.href = 'dashboard.html'; // თუ სესია უკვე არსებობს -> გადამისამართება დეშბორდზე
+        window.location.href = 'dashboard.html'; // Redirect to dashboard if already logged in
     }
 }
 
-// 4. სესიის დახურვა (Logout ფუნქცია, რომელიც აკლდა!)
+// Session Logout logic
 function logout() {
-    localStorage.removeItem('crm_session'); // ვშლით მიმდინარე სესიას
-    window.location.href = 'index.html'; // გადავდივართ ლოგინის გვერდზე
+    Storage.remove(STORAGE_KEYS.SESSION);
+    window.location.href = 'index.html';
 }
 
-// 5. ავტომატური შემოწმება გვერდის ჩატვირთვისას (Flicker-ის თავიდან ასაცილებლად)
-const currentPath = window.location.pathname;
+// Make logout globally available for any inline onclick attributes
+window.logout = logout;
 
-if (currentPath.includes('dashboard.html') || currentPath.includes('clients.html') || currentPath.includes('profile.html')) {
+// Route checking supporting both HTML extensions and extensionless paths (Netlify/Vercel)
+const currentPath = window.location.pathname.toLowerCase();
+const protectedRoutes = ['dashboard', 'clients', 'profile'];
+const publicRoutes = ['index', 'signup', 'forgot-password'];
+
+const isProtectedRoute = protectedRoutes.some(route => currentPath.includes(route));
+const isPublicRoute = publicRoutes.some(route => currentPath.includes(route)) || currentPath === '/' || currentPath.endsWith('/');
+
+if (isProtectedRoute) {
     checkAuthForProtectedRoute();
-} else if (currentPath.includes('index.html') || currentPath.includes('signup.html') || currentPath.includes('forgot-password.html') || currentPath === '/' || currentPath.endsWith('/')) {
+} else if (isPublicRoute) {
     checkAuthForPublicPage();
 }

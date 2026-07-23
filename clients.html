@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>10X CRM - Clients Directory</title>
-    
+    <title>10X CRM - Clients</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-
     <script src="js/guard.js"></script>
     <script src="js/theme.js"></script>
 </head>
@@ -40,27 +38,21 @@
         <div class="container">
             
             <div class="page-header-bar">
-                <div>
-                    <h1>Clients Directory</h1>
-                    <p class="subtitle">Manage, filter, and track all your active business leads</p>
-                </div>
-                <button type="button" class="btn-submit-glass btn-add-client" onclick="openAddClientModal()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    Add New Client
-                </button>
+                <h1>Clients Base</h1>
+                <button type="button" class="btn-submit-glass btn-add-client" onclick="openAddClientModal()">+ Add Client</button>
             </div>
+            
+            <div id="loadingIndicator" class="loading-box" style="display: none;">Loading clients...</div>
 
             <div class="toolbar">
                 <div class="search-box-wrapper">
-                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" id="searchInput" class="form-input-neo search-input" placeholder="Search by client name, company or email...">
+                    <input type="text" id="searchInput" class="form-input-neo search-input" placeholder="🔍 Search by name or company...">
                 </div>
 
                 <div class="filter-chips">
                     <button class="chip active" data-status="All" onclick="filterByStatus('All')">All</button>
                     <button class="chip" data-status="Lead" onclick="filterByStatus('Lead')">Lead</button>
                     <button class="chip" data-status="Contacted" onclick="filterByStatus('Contacted')">Contacted</button>
-                    <button class="chip" data-status="Proposal" onclick="filterByStatus('Proposal')">Proposal</button>
                     <button class="chip" data-status="Won" onclick="filterByStatus('Won')">Won</button>
                     <button class="chip" data-status="Lost" onclick="filterByStatus('Lost')">Lost</button>
                 </div>
@@ -93,17 +85,17 @@
                     <div class="error-text" id="clientNameError"></div>
                 </div>
                 <div class="form-group">
-                    <label>Email Address</label>
+                    <label>Email</label>
                     <input type="email" id="clientEmail" class="form-input-neo" placeholder="e.g. john@example.com">
                     <div class="error-text" id="clientEmailError"></div>
                 </div>
                 <div class="form-group">
-                    <label>Phone Number (optional)</label>
-                    <input type="text" id="clientPhone" class="form-input-neo" placeholder="e.g. +1 555-0192">
+                    <label>Phone (optional)</label>
+                    <input type="text" id="clientPhone" class="form-input-neo" placeholder="e.g. +995 555 12 34 56">
                     <div class="error-text" id="clientPhoneError"></div>
                 </div>
                 <div class="form-group">
-                    <label>Company Name</label>
+                    <label>Company</label>
                     <input type="text" id="clientCompany" class="form-input-neo" placeholder="e.g. Acme Corp">
                     <div class="error-text" id="clientCompanyError"></div>
                 </div>
@@ -113,11 +105,10 @@
                     <div class="error-text" id="clientDealValueError"></div>
                 </div>
                 <div class="form-group">
-                    <label>Pipeline Status</label>
+                    <label>Status</label>
                     <select id="clientStatus" class="form-input-neo custom-select">
                         <option value="Lead" selected>Lead</option>
                         <option value="Contacted">Contacted</option>
-                        <option value="Proposal">Proposal</option>
                         <option value="Won">Won</option>
                         <option value="Lost">Lost</option>
                     </select>
@@ -128,53 +119,53 @@
     </div>
 
     <div class="modal-overlay" id="clientDetailsModal" style="display: none;">
-        <div class="card modal-card modal-card-wide">
-            <div class="modal-header">
-                <h2>Client Details</h2>
-                <button type="button" class="btn-close-modal" onclick="closeDetailsModal()">✕</button>
-            </div>
-
-            <div class="details-profile-banner">
-                <img src="" id="detAvatar" class="details-avatar" alt="Client Avatar">
-                <div>
-                    <h3 id="detName" class="details-name"></h3>
-                    <p id="detCompany" class="details-company"></p>
-                    <p id="detMeta" class="details-meta"></p>
-                </div>
-            </div>
-
-            <div class="details-info-grid">
-                <div class="info-item">
-                    <span class="info-label">Email Address</span>
-                    <strong id="detEmail" class="info-value"></strong>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Phone Number</span>
-                    <strong id="detPhone" class="info-value"></strong>
-                </div>
-            </div>
-
-            <div class="notes-section">
-                <h4>Notes History</h4>
-                <div id="notesContainer" class="notes-list-box"></div>
-                <div class="add-note-row">
-                    <input type="text" id="newNoteInput" class="form-input-neo note-input" placeholder="Write a note or call record...">
-                    <button type="button" class="btn-submit-glass btn-add-note" id="addNoteBtn">Add Note</button>
-                </div>
-            </div>
-
-            <button type="button" class="btn-reminder" id="remindBtn" onclick="setOneMinReminder()">
-                🔔 Remind me in 1 min (Follow-up)
-            </button>
+    <div class="card modal-card modal-card-wide">
+        <div class="modal-header">
+            <h2>Client Details</h2>
+            <button type="button" class="btn-close-modal" onclick="closeDetailsModal()">✕</button>
         </div>
-    </div>
 
+        <div class="details-profile-banner">
+            <img src="" id="detAvatar" class="details-avatar" alt="Client Avatar">
+            <div class="details-user-info">
+                <h3 id="detName" class="details-name"></h3>
+                <p id="detCompany" class="details-company"></p>
+                <p id="detMeta" class="details-meta"></p>
+            </div>
+        </div>
+
+        <div class="details-info-grid">
+            <div class="info-item">
+                <span class="info-label">Email Address</span>
+                <strong id="detEmail" class="info-value"></strong>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Phone Number</span>
+                <strong id="detPhone" class="info-value"></strong>
+            </div>
+        </div>
+
+        <div class="notes-section">
+            <h4>Notes History</h4>
+            <div id="notesContainer" class="notes-list-box"></div>
+            
+            <div class="add-note-row">
+                <input type="text" id="newNoteInput" class="form-input-neo note-input" placeholder="Write a note or call record...">
+                <button type="button" class="btn-submit-glass btn-add-note" id="addNoteBtn">Add Note</button>
+            </div>
+        </div>
+
+        <button type="button" class="btn-reminder" id="remindBtn" onclick="setOneMinReminder()">
+            🔔 Remind me in 1 min (Follow-up)
+        </button>
+    </div>
+</div>
     <script src="js/auth.js"></script>
     <script src="js/clients.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             initClients();
-            document.getElementById('addClientForm').addEventListener('submit', handleAddClient);
+            document.getElementById('addClientForm')?.addEventListener('submit', handleAddClient);
         });
     </script>
 </body>

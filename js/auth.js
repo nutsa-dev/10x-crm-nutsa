@@ -1,19 +1,44 @@
+/**
+ * 10X CRM - Authentication Controller (Login, Sign Up, Password Reset)
+ */
+
 // ==========================================================================
-// 1. დამხმარე ფუნქციები LocalStorage-თან და DOM-თან სამუშაოდ
+// 1. Validation Rules & Constants (Easy to edit during live exam coding!)
+// ==========================================================================
+const AUTH_RULES = {
+    MIN_NAME_LENGTH: 3,
+    MIN_PASSWORD_LENGTH: 8,
+    EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+};
+
+// ==========================================================================
+// 2. Helper Functions
 // ==========================================================================
 
-// მომხმარებლების მასივის წაკითხვა LocalStorage-იდან
+// Get users from the central Storage utility defined in guard.js
 function getUsers() {
-    const users = localStorage.getItem('crm_users');
-    return users ? JSON.parse(users) : [];
+    let users = Storage.get(STORAGE_KEYS.USERS);
+    if (!users || users.length === 0) {
+        users = [{
+            id: 1720180200000,
+            fullName: 'Demo User',
+            email: 'demo@test.com',
+            password: 'Password123',
+            company: '10X Demo LLC',
+            isFirstLogin: false,
+            createdAt: new Date().toISOString()
+        }];
+        Storage.set(STORAGE_KEYS.USERS, users);
+    }
+    return users;
 }
 
-// მომხმარებლების მასივის შენახვა LocalStorage-ში
+// Save users using the central Storage utility defined in guard.js
 function saveUsers(users) {
-    localStorage.setItem('crm_users', JSON.stringify(users));
+    Storage.set(STORAGE_KEYS.USERS, users);
 }
 
-// შეცდომების ტექსტებისა და წითელი საზღვრების გასუფთავება
+// Clears all form input error states and error messages
 function clearErrors(form) {
     const errorElements = form.querySelectorAll('.error-text');
     errorElements.forEach(el => el.textContent = '');
@@ -25,7 +50,7 @@ function clearErrors(form) {
     if (globalError) globalError.textContent = '';
 }
 
-// კონკრეტულ ველზე შეცდომის გამოსახვა
+// Applies error classes to inputs and shows helper messages
 function showFieldError(inputId, errorId, message) {
     const input = document.getElementById(inputId);
     const errorEl = document.getElementById(errorId);
@@ -34,23 +59,8 @@ function showFieldError(inputId, errorId, message) {
     if (errorEl) errorEl.textContent = message;
 }
 
-// Toast შეტყობინების გამოჩენა (ეკრანის კუთხეში)
-function showToast(message, isSuccess = true) {
-    const toast = document.getElementById('toast');
-    if (!toast) return;
-
-    toast.textContent = message;
-    toast.style.color = isSuccess ? 'var(--accent-orange)' : 'var(--danger-color)';
-    toast.style.display = 'block';
-
-    setTimeout(() => {
-        toast.style.display = 'none';
-    }, 3000);
-}
-
-
 // ==========================================================================
-// 2. ავტორიზაციის ლოგიკა (Login)
+// 3. Login Flow (P2)
 // ==========================================================================
 function handleLogin(event) {
     event.preventDefault();
@@ -86,21 +96,19 @@ function handleLogin(event) {
         return;
     }
 
-    // სესიის შენახვა LocalStorage-ში
-    localStorage.setItem('crm_session', JSON.stringify({
+    // Save active session using our central Storage helper (P2.3)
+    Storage.set(STORAGE_KEYS.SESSION, {
         userId: user.id,
         email: user.email,
         fullName: user.fullName,
         loginTime: new Date().toISOString()
-    }));
+    });
 
-    // გადამისამართება დეშბორდზე
     window.location.href = 'dashboard.html';
 }
 
-
 // ==========================================================================
-// 3. რეგისტრაციის ლოგიკა (Sign Up)
+// 4. Registration Flow (Sign Up - P1)
 // ==========================================================================
 function handleSignUp(event) {
     event.preventDefault();
@@ -121,36 +129,35 @@ function handleSignUp(event) {
 
     let hasError = false;
 
-    // Full Name ვალიდაცია
-    if (fullName.length < 3) {
-        showFieldError('fullName', 'fullNameError', 'Full name must be at least 3 characters');
+    // Full Name validation
+    if (fullName.length < AUTH_RULES.MIN_NAME_LENGTH) {
+        showFieldError('fullName', 'fullNameError', `Full name must be at least ${AUTH_RULES.MIN_NAME_LENGTH} characters`);
         hasError = true;
     }
 
-    // Email ფორმატის ვალიდაცია Regex-ით
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    // Email format validation
+    if (!AUTH_RULES.EMAIL_REGEX.test(email)) {
         showFieldError('email', 'emailError', 'Please enter a valid email address');
         hasError = true;
     }
 
-    // Email დუბლიკატის შემოწმება ბაზაში
+    // Duplicate email verification in Local Database
     const users = getUsers();
     if (users.some(u => u.email === email)) {
         showFieldError('email', 'emailError', 'An account with this email already exists');
         hasError = true;
     }
 
-    // Password სირთულის ვალიდაცია
+    // Password complexity check (Length, Letters, and Numbers)
     const hasLetter = /[a-zA-Z]/.test(password);
     const hasDigit = /[0-9]/.test(password);
 
-    if (password.length < 8 || !hasLetter || !hasDigit) {
-        showFieldError('password', 'passwordError', 'Password must be at least 8 characters and contain a letter and a number');
+    if (password.length < AUTH_RULES.MIN_PASSWORD_LENGTH || !hasLetter || !hasDigit) {
+        showFieldError('password', 'passwordError', `Password must be at least ${AUTH_RULES.MIN_PASSWORD_LENGTH} characters and contain a letter and a number`);
         hasError = true;
     }
 
-    // Confirm Password დამთხვევა
+    // Confirm Password check
     if (password !== confirmPassword) {
         showFieldError('confirmPassword', 'confirmPasswordError', 'Passwords do not match');
         hasError = true;
@@ -158,7 +165,7 @@ function handleSignUp(event) {
 
     if (hasError) return;
 
-    // ახალი მომხმარებლის ობიექტი
+    // User schema construction
     const newUser = {
         id: Date.now(),
         fullName: fullName,
@@ -172,6 +179,7 @@ function handleSignUp(event) {
     users.push(newUser);
     saveUsers(users);
 
+    // Call global showToast function defined in guard.js
     showToast('Account created successfully! Redirecting to login...', true);
 
     setTimeout(() => {
@@ -179,11 +187,10 @@ function handleSignUp(event) {
     }, 1500);
 }
 
-
 // ==========================================================================
-// 4. პაროლის აღდგენის ლოგიკა (Forgot / Reset Password)
+// 5. Password Recovery Flow (Forgot Password)
 // ==========================================================================
-let verifiedResetEmail = null; // ინახავს დადასტურებულ ელფოსტას
+let verifiedResetEmail = null; 
 
 function handlePasswordReset(event) {
     event.preventDefault();
@@ -196,7 +203,7 @@ function handlePasswordReset(event) {
     const submitBtn = document.getElementById('resetSubmitBtn');
     const newPasswordStepGroup = document.getElementById('newPasswordStepGroup');
 
-    // ნაბიჯი 1: ელფოსტის შემოწმება ბაზაში
+    // Step 1: Verify email address exists in user base
     if (!verifiedResetEmail) {
         const email = emailInput.value.trim().toLowerCase();
 
@@ -213,16 +220,16 @@ function handlePasswordReset(event) {
             return;
         }
 
-        // ელფოსტა იპოვა - გადავდივართ მე-2 ნაბიჯზე
+        // Email verified, reveal step 2 inputs
         verifiedResetEmail = email;
-        emailInput.disabled = true; // ელფოსტის ველს ვბლოკავთ
-        newPasswordStepGroup.style.display = 'block'; // ვხსნით ახალ ველებს
+        emailInput.disabled = true; 
+        newPasswordStepGroup.style.display = 'block'; 
         submitBtn.textContent = 'Update Password';
         showToast('Email verified! Enter your new password.', true);
         return;
     }
 
-    // ნაბიჯი 2: ახალი პაროლის ვალიდაცია და შენახვა
+    // Step 2: Validate new password complexity and confirm identity
     const newPassword = newPassInput.value;
     const confirmPassword = confirmPassInput.value;
     let hasError = false;
@@ -230,8 +237,8 @@ function handlePasswordReset(event) {
     const hasLetter = /[a-zA-Z]/.test(newPassword);
     const hasDigit = /[0-9]/.test(newPassword);
 
-    if (newPassword.length < 8 || !hasLetter || !hasDigit) {
-        showFieldError('resetNewPassword', 'resetNewPasswordError', 'Password must be at least 8 characters and contain a letter and a number');
+    if (newPassword.length < AUTH_RULES.MIN_PASSWORD_LENGTH || !hasLetter || !hasDigit) {
+        showFieldError('resetNewPassword', 'resetNewPasswordError', `Password must be at least ${AUTH_RULES.MIN_PASSWORD_LENGTH} characters and contain a letter and a number`);
         hasError = true;
     }
 
@@ -242,7 +249,7 @@ function handlePasswordReset(event) {
 
     if (hasError) return;
 
-    // LocalStorage-ში პაროლის განახლება
+    // Save changes to storage
     let users = getUsers();
     users = users.map(u => {
         if (u.email === verifiedResetEmail) {

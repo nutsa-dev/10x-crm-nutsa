@@ -1,5 +1,6 @@
 /**
- * 10X CRM - Executive Dashboard Controller
+ * 10X CRM - Executive Dashboard Controller (P3 - FULL)
+ * Updates metrics cards, pipeline graphics, and populates the recent clients table.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -8,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderDashboardMetrics();
 });
 
+// 1. Clock and date initialization in greeting section
 function initClock() {
     const clockElement = document.getElementById('liveClock');
     const dateElement = document.getElementById('currentDate');
@@ -38,49 +40,52 @@ function initClock() {
     setInterval(updateTime, 1000);
 }
 
+// 2. Personalised user greeting banner based on active session
 function renderWelcomeBanner() {
     const greetingEl = document.getElementById('welcomeGreeting');
     if (!greetingEl) return;
 
-    const sessionData = localStorage.getItem('crm_session');
-    if (!sessionData) return;
+    // Use centralized Storage utility (guard.js)
+    const session = Storage.get(STORAGE_KEYS.SESSION);
+    if (!session) return;
 
-    const session = JSON.parse(sessionData);
-    const users = JSON.parse(localStorage.getItem('crm_users') || '[]');
+    const users = Storage.get(STORAGE_KEYS.USERS, []);
 
     const currentUserIndex = users.findIndex(u => u.id === session.userId || u.email === session.email);
     const firstName = session.fullName ? session.fullName.split(' ')[0] : 'User';
 
     if (currentUserIndex !== -1 && users[currentUserIndex].isFirstLogin) {
-        greetingEl.textContent = `Welcome, ${firstName}! 👋`;
+        greetingEl.textContent = `Welcome, ${firstName}!`;
         users[currentUserIndex].isFirstLogin = false;
-        localStorage.setItem('crm_users', JSON.stringify(users));
+        Storage.set(STORAGE_KEYS.USERS, users);
     } else {
-        greetingEl.textContent = `Welcome back, ${firstName}! 👋`;
+        greetingEl.textContent = `Welcome back, ${firstName}!`;
     }
 }
 
+// 3. Metric card and Pipeline value calculations
 function renderDashboardMetrics() {
-    const clients = JSON.parse(localStorage.getItem('crm_clients') || '[]');
+    // Use centralized Storage utility (guard.js)
+    const clients = Storage.get(STORAGE_KEYS.CLIENTS, []);
     const totalClientsCount = clients.length;
 
-    // 1. Total Clients
+    // 3.1. Total Clients
     document.getElementById('totalClients').textContent = totalClientsCount;
 
-    // 2. Active Deals
+    // 3.2. Active Deals count
     const activeDeals = clients.filter(c => ['Lead', 'Contacted', 'Proposal'].includes(c.status));
     document.getElementById('activeDeals').textContent = activeDeals.length;
 
-    // 3. Pipeline Value (სწორი dealValue ველის დაჯამება)
+    // 3.3. Pipeline Value sum
     const totalValue = clients.reduce((sum, c) => sum + (parseFloat(c.dealValue) || parseFloat(c.budget) || 0), 0);
     document.getElementById('totalRevenue').textContent = `$${totalValue.toLocaleString('en-US')}`;
 
-    // 4. Win Rate
+    // 3.4. Win Rate ratio
     const wonClients = clients.filter(c => c.status === 'Won').length;
     const winRate = totalClientsCount > 0 ? Math.round((wonClients / totalClientsCount) * 100) : 0;
     document.getElementById('conversionRate').textContent = `${winRate}%`;
 
-    // 5. Pipeline რაოდენობები
+    // 3.5. Pipeline distribution calculations
     const stageCounts = { Lead: 0, Contacted: 0, Proposal: 0, Won: 0, Lost: 0 };
     clients.forEach(c => {
         if (stageCounts.hasOwnProperty(c.status)) {
@@ -94,7 +99,7 @@ function renderDashboardMetrics() {
     document.getElementById('countWon').textContent = stageCounts.Won;
     document.getElementById('countLost').textContent = stageCounts.Lost;
 
-    // პროგრეს-ბარების პროპორციული გამოთვლა
+    // Proportional progress bar width rendering
     const maxCount = Math.max(...Object.values(stageCounts), 1);
     if (document.getElementById('barLead')) document.getElementById('barLead').style.width = `${(stageCounts.Lead / maxCount) * 100}%`;
     if (document.getElementById('barContacted')) document.getElementById('barContacted').style.width = `${(stageCounts.Contacted / maxCount) * 100}%`;
@@ -105,6 +110,7 @@ function renderDashboardMetrics() {
     renderRecentClientsTable(clients);
 }
 
+// 4. Populate top 5 recently registered clients
 function renderRecentClientsTable(clients) {
     const tableBody = document.getElementById('recentClientsTable');
     if (!tableBody) return;
@@ -142,6 +148,7 @@ function renderRecentClientsTable(clients) {
     }).join('');
 }
 
+// Helper to sanitize HTML strings
 function escapeHTML(str) {
     return String(str || '').replace(/[&<>"']/g, match => {
         const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };

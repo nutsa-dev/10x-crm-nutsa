@@ -1,58 +1,59 @@
 /**
  * 10X CRM - Global Theme & Live Clock Controller
- * ტვირთავს თემას (Light/Dark) და მართავს ჰედერის ცოცხალ საათს ყველა გვერდზე.
+ * Manages theme application, theme toggling, and updating the global header clock.
  */
 
-// გვერდის ჩატვირთვისთანავე ვუშვებთ თემას და საათს
 document.addEventListener('DOMContentLoaded', () => {
     applyStoredTheme();
     initGlobalClock();
 });
 
-// ==========================================================================
-// 1. ცოცხალი საათის გლობალური ფუნქცია (Dashboard, Clients, Profile)
-// ==========================================================================
+// 1. Live clock (Date | Time) updating every second
 function initGlobalClock() {
     const clockElement = document.getElementById('liveClock');
     if (!clockElement) return;
 
     function updateTime() {
         const now = new Date();
-        clockElement.textContent = now.toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true
-        });
+        const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+
+        // Date + Time format
+        clockElement.textContent = `${dateStr}  |  ${timeStr}`;
     }
 
     updateTime();
     setInterval(updateTime, 1000);
 }
 
-// ==========================================================================
-// 2. თემის გადართვის ლოგიკა (Light / Dark Mode)
-// ==========================================================================
+// 2. Read stored theme and apply to document body
 function applyStoredTheme() {
-    const savedTheme = localStorage.getItem('crm_theme') || 'light';
-    const toggleBtn = document.getElementById('themeToggleBtn');
+    // Uses the central Storage helper defined in guard.js
+    const savedTheme = Storage.get(STORAGE_KEYS.THEME, 'light');
+    const toggleBtns = document.querySelectorAll('#themeToggleBtn, .btn-theme-fixed');
 
     if (savedTheme === 'dark') {
         document.body.classList.add('dark-mode');
-        if (toggleBtn) toggleBtn.textContent = '☀️';
+        toggleBtns.forEach(btn => btn.textContent = '☀️');
     } else {
         document.body.classList.remove('dark-mode');
-        if (toggleBtn) toggleBtn.textContent = '🌙';
+        toggleBtns.forEach(btn => btn.textContent = '🌙');
     }
 }
 
+// 3. Toggle dark/light mode
 function toggleTheme() {
     const isDark = document.body.classList.toggle('dark-mode');
     const newTheme = isDark ? 'dark' : 'light';
-    localStorage.setItem('crm_theme', newTheme);
+    
+    // Uses the central Storage helper defined in guard.js
+    Storage.set(STORAGE_KEYS.THEME, newTheme);
 
-    const toggleBtn = document.getElementById('themeToggleBtn');
-    if (toggleBtn) {
-        toggleBtn.textContent = isDark ? '☀️' : '🌙';
-    }
+    const toggleBtns = document.querySelectorAll('#themeToggleBtn, .btn-theme-fixed');
+    toggleBtns.forEach(btn => {
+        btn.textContent = isDark ? '☀️' : '🌙';
+    });
 }
+
+// Make globally available for backward-compatibility with inline HTML events
+window.toggleTheme = toggleTheme;
