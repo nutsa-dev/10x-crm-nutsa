@@ -65,7 +65,7 @@ function showToast(message, isSuccess = true) {
 
     toast.textContent = message;
     toast.style.color = isSuccess ? 'var(--accent-orange)' : 'var(--danger-color)';
-    toast.style.display = 'block';
+    toast.classList.add('show');
 
     // Clear previous timeout if user triggers multiple toasts in sequence
     if (window.toastTimeout) {
@@ -73,7 +73,7 @@ function showToast(message, isSuccess = true) {
     }
     
     window.toastTimeout = setTimeout(() => {
-        toast.style.display = 'none';
+        toast.classList.remove('show');
     }, 3000);
 }
 
