@@ -14,9 +14,13 @@ const CLIENT_RULES = {
 // Global state variables
 let clientsState = [];
 let currentDetailsClientId = null;
+let editingClientId = null;
 let currentFilterStatus = 'All';
 let currentSearchQuery = '';
 let currentSortOption = 'Newest';
+let currentView = 'grid';
+let currentPage = 1;
+const itemsPerPage = 8;
 
 // ==========================================================================
 // 2. Initialization and API Sync
@@ -32,6 +36,7 @@ async function initClients() {
     }
 
     document.getElementById('searchInput')?.addEventListener('input', handleSearchInput);
+    document.addEventListener('keydown', handleGlobalKeydown);
 }
 
 // Fetch initial database of 30 mock clients from server (P4.2)
@@ -114,11 +119,31 @@ function getVisibleClients() {
 }
 
 function applyFiltersAndRender() {
-    renderClients(getVisibleClients());
+    const visible = getVisibleClients();
+    const loadMoreWrapper = document.getElementById('loadMoreWrapper');
+    
+    if (currentView === 'grid') {
+        const paginated = visible.slice(0, currentPage * itemsPerPage);
+        renderClients(paginated);
+        
+        if (loadMoreWrapper) {
+            if (visible.length > paginated.length) {
+                loadMoreWrapper.style.display = 'block';
+            } else {
+                loadMoreWrapper.style.display = 'none';
+            }
+        }
+    } else if (currentView === 'kanban') {
+        renderKanban(visible);
+        if (loadMoreWrapper) {
+            loadMoreWrapper.style.display = 'none';
+        }
+    }
 }
 
 function filterByStatus(status) {
     currentFilterStatus = status;
+    currentPage = 1; // reset page count
     const chips = document.querySelectorAll('.filter-chips .chip');
     chips.forEach(chip => {
         if (chip.getAttribute('data-status') === status) {
@@ -130,15 +155,81 @@ function filterByStatus(status) {
     applyFiltersAndRender();
 }
 
+let searchDebounceTimeout = null;
+
 function handleSearchInput(event) {
-    currentSearchQuery = event.target.value.trim();
-    applyFiltersAndRender();
+    const query = event.target.value.trim();
+    clearTimeout(searchDebounceTimeout);
+    
+    searchDebounceTimeout = setTimeout(async () => {
+        currentSearchQuery = query;
+        currentPage = 1; // reset page count
+        if (query) {
+            await performServerSearch(query);
+        } else {
+            const localClients = Storage.get(STORAGE_KEYS.CLIENTS);
+            clientsState = localClients || [];
+            applyFiltersAndRender();
+        }
+    }, 500);
+}
+
+async function performServerSearch(query) {
+    const container = document.getElementById('clientsContainer');
+    if (container) {
+        container.innerHTML = '<div class="loading-box">Searching server...</div>';
+    }
+    try {
+        const response = await fetch(`https://dummyjson.com/users/search?q=${encodeURIComponent(query)}`);
+        if (!response.ok) throw new Error('Search failed');
+        const data = await response.json();
+        
+        const localClients = Storage.get(STORAGE_KEYS.CLIENTS, []);
+        
+        const serverClients = data.users.map(user => {
+            const localMatch = localClients.find(lc => lc.id === user.id);
+            if (localMatch) {
+                return localMatch;
+            }
+            
+            const randomDealValue = Math.floor(Math.random() * (10000 - 500 + 1)) + 500;
+            return {
+                id: user.id,
+                name: `${user.firstName} ${user.lastName}`.trim(),
+                phone: user.phone || '+1 555-0192',
+                email: user.email.toLowerCase(),
+                company: user.company ? user.company.name : 'Independent LLC',
+                image: user.image || 'https://dummyjson.com/icon/emilys/128',
+                status: 'Lead',
+                dealValue: randomDealValue,
+                notes: [],
+                createdAt: new Date(Date.now() - Math.random() * 10 * 24 * 60 * 60 * 1000).toISOString()
+            };
+        });
+        
+        const localMatchingOnly = localClients.filter(lc => {
+            if (serverClients.some(sc => sc.id === lc.id)) return false;
+            const q = query.toLowerCase();
+            return (lc.name && lc.name.toLowerCase().includes(q)) || 
+                   (lc.company && lc.company.toLowerCase().includes(q)) ||
+                   (lc.email && lc.email.toLowerCase().includes(q));
+        });
+        
+        clientsState = [...localMatchingOnly, ...serverClients];
+        applyFiltersAndRender();
+    } catch (error) {
+        console.error('Server search failed:', error);
+        const localClients = Storage.get(STORAGE_KEYS.CLIENTS, []);
+        clientsState = localClients || [];
+        applyFiltersAndRender();
+    }
 }
 
 function handleSortChange() {
     const select = document.getElementById('sortSelect');
     if (select) {
         currentSortOption = select.value;
+        currentPage = 1;
         applyFiltersAndRender();
     }
 }
@@ -193,6 +284,7 @@ function renderClients(clients) {
                         <option value="Lost" ${client.status === 'Lost' ? 'selected' : ''}>Lost</option>
                     </select>
                     
+                    <button type="button" class="btn-edit-client" onclick="openEditClientModal(${client.id})">Edit</button>
                     <button type="button" class="btn-delete-client" onclick="deleteClient(${client.id})">Delete</button>
                 </div>
             </div>
@@ -212,6 +304,9 @@ function updateClientStatus(id, newStatus) {
 // ==========================================================================
 // 5. Client Details Modal (P4.8)
 // ==========================================================================
+let callInterval = null;
+let callSeconds = 0;
+
 function openDetailsModal(id) {
     const client = clientsState.find(c => c.id === id);
     if (!client) return;
@@ -235,12 +330,77 @@ function openDetailsModal(id) {
 
     const addNoteBtn = document.getElementById('addNoteBtn');
     if (addNoteBtn) addNoteBtn.onclick = handleAddNote;
+
+    // Reset Call UI
+    const startBtn = document.getElementById('startCallBtn');
+    const endBtn = document.getElementById('endCallBtn');
+    const durationDisplay = document.getElementById('callDurationDisplay');
+    if (startBtn) startBtn.disabled = false;
+    if (endBtn) endBtn.disabled = true;
+    if (durationDisplay) durationDisplay.textContent = '00:00';
+    clearInterval(callInterval);
+    callInterval = null;
 }
 
 function closeDetailsModal() {
     document.getElementById('clientDetailsModal').style.display = 'none';
     document.getElementById('newNoteInput').value = '';
     currentDetailsClientId = null;
+    
+    clearInterval(callInterval);
+    callInterval = null;
+}
+
+function startCall() {
+    callSeconds = 0;
+    const startBtn = document.getElementById('startCallBtn');
+    const endBtn = document.getElementById('endCallBtn');
+    const durationDisplay = document.getElementById('callDurationDisplay');
+    
+    if (startBtn) startBtn.disabled = true;
+    if (endBtn) endBtn.disabled = false;
+    if (durationDisplay) durationDisplay.textContent = '00:00';
+    
+    clearInterval(callInterval);
+    callInterval = setInterval(() => {
+        callSeconds++;
+        const mins = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+        const secs = String(callSeconds % 60).padStart(2, '0');
+        if (durationDisplay) durationDisplay.textContent = `${mins}:${secs}`;
+    }, 1000);
+}
+
+function endCall() {
+    clearInterval(callInterval);
+    callInterval = null;
+    
+    const startBtn = document.getElementById('startCallBtn');
+    const endBtn = document.getElementById('endCallBtn');
+    const durationDisplay = document.getElementById('callDurationDisplay');
+    
+    if (startBtn) startBtn.disabled = false;
+    if (endBtn) endBtn.disabled = true;
+    
+    const mins = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+    const secs = String(callSeconds % 60).padStart(2, '0');
+    const durationText = `${mins}:${secs}`;
+    
+    if (currentDetailsClientId) {
+        clientsState = clientsState.map(client => {
+            if (client.id === currentDetailsClientId) {
+                const updatedNotes = [...(client.notes || [])];
+                updatedNotes.push({
+                    text: `📞 Call duration: ${durationText}`,
+                    date: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })
+                });
+                return { ...client, notes: updatedNotes };
+            }
+            return client;
+        });
+        Storage.set(STORAGE_KEYS.CLIENTS, clientsState);
+        const updatedClient = clientsState.find(c => c.id === currentDetailsClientId);
+        renderNotes(updatedClient.notes);
+    }
 }
 
 function renderNotes(notes) {
@@ -315,11 +475,42 @@ function openAddClientModal() {
     }
 }
 
+function openEditClientModal(id) {
+    const client = clientsState.find(c => c.id === id);
+    if (!client) return;
+
+    editingClientId = id;
+
+    document.getElementById('clientName').value = client.name || '';
+    document.getElementById('clientEmail').value = client.email || '';
+    document.getElementById('clientPhone').value = client.phone !== '+1 555-0192' ? (client.phone || '') : '';
+    document.getElementById('clientCompany').value = client.company || '';
+    document.getElementById('clientDealValue').value = client.dealValue || '';
+    document.getElementById('clientStatus').value = client.status || 'Lead';
+
+    const titleEl = document.getElementById('addClientModalTitle');
+    const submitBtn = document.getElementById('addClientSubmitBtn');
+    if (titleEl) titleEl.textContent = 'Edit Client';
+    if (submitBtn) submitBtn.textContent = 'Save Changes';
+
+    const modal = document.getElementById('addClientModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        clearClientFormErrors();
+    }
+}
+
 function closeAddClientModal() {
     const modal = document.getElementById('addClientModal');
     if (modal) {
         modal.style.display = 'none';
         document.getElementById('addClientForm').reset();
+        
+        const titleEl = document.getElementById('addClientModalTitle');
+        const submitBtn = document.getElementById('addClientSubmitBtn');
+        if (titleEl) titleEl.textContent = 'Add New Client';
+        if (submitBtn) submitBtn.textContent = 'Create Client';
+        editingClientId = null;
     }
 }
 
@@ -334,7 +525,6 @@ function clearClientFormErrors() {
     form.querySelectorAll('.form-input-neo').forEach(input => input.classList.remove('input-error'));
 }
 
-// Send POST request on client creation as required by PRD
 async function handleAddClient(event) {
     event.preventDefault();
     clearClientFormErrors();
@@ -348,31 +538,26 @@ async function handleAddClient(event) {
 
     let hasError = false;
 
-    // Full name validation
     if (name.length < CLIENT_RULES.MIN_NAME_LENGTH) {
         showClientError('clientName', 'clientNameError', `Name must be at least ${CLIENT_RULES.MIN_NAME_LENGTH} characters`);
         hasError = true;
     }
 
-    // Email format validation
     if (!CLIENT_RULES.EMAIL_REGEX.test(email)) {
         showClientError('clientEmail', 'clientEmailError', 'Please enter a valid email address');
         hasError = true;
     }
 
-    // Duplicate email verification in Local Database
-    if (clientsState.some(c => c.email.toLowerCase() === email)) {
+    if (clientsState.some(c => c.email.toLowerCase() === email && c.id !== editingClientId)) {
         showClientError('clientEmail', 'clientEmailError', 'A client with this email already exists');
         hasError = true;
     }
 
-    // Company validation
     if (!company) {
         showClientError('clientCompany', 'clientCompanyError', 'Company name is required');
         hasError = true;
     }
 
-    // Deal value validation
     if (isNaN(dealValue) || dealValue <= CLIENT_RULES.MIN_DEAL_VALUE) {
         showClientError('clientDealValue', 'clientDealValueError', 'Deal value must be a positive number');
         hasError = true;
@@ -383,8 +568,52 @@ async function handleAddClient(event) {
     const firstName = name.split(' ')[0] || name;
     const lastName = name.split(' ').slice(1).join(' ') || '';
 
+    if (editingClientId) {
+        try {
+            const response = await fetch(`https://dummyjson.com/users/${editingClientId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    phone: phone,
+                    company: { name: company }
+                })
+            });
+
+            if (!response.ok && response.status !== 404) {
+                throw new Error('API server returned error on client edit');
+            }
+
+            clientsState = clientsState.map(c => {
+                if (c.id === editingClientId) {
+                    return {
+                        ...c,
+                        name: name,
+                        email: email,
+                        phone: phone || '+1 555-0192',
+                        company: company,
+                        dealValue: dealValue,
+                        status: status
+                    };
+                }
+                return c;
+            });
+
+            Storage.set(STORAGE_KEYS.CLIENTS, clientsState);
+            applyFiltersAndRender();
+            closeAddClientModal();
+            showToast('Client updated successfully ✓', true);
+
+        } catch (err) {
+            console.error("API error editing client:", err);
+            showToast('Could not save client changes to the server. Try again.', false);
+        }
+        return;
+    }
+
     try {
-        // Send POST request (PRD Requirement)
         const response = await fetch('https://dummyjson.com/users/add', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -401,9 +630,8 @@ async function handleAddClient(event) {
 
         const serverUser = await response.json();
 
-        // Construct new client object using API server user template, prepend to database
         const newClient = {
-            id: Date.now(), // Ensure unique id for local storage
+            id: Date.now(),
             name: name,
             email: email,
             phone: phone || '+1 555-0192',
@@ -470,3 +698,178 @@ function escapeHTML(str) {
         return escapeMap[match];
     });
 }
+
+// Kanban drag & drop and view toggle logic
+function switchView(view) {
+    currentView = view;
+    const gridBtn = document.getElementById('viewToggleGrid');
+    const kanbanBtn = document.getElementById('viewToggleKanban');
+    const gridContainer = document.getElementById('clientsContainer');
+    const kanbanContainer = document.getElementById('kanbanContainer');
+    const toolbar = document.querySelector('.toolbar');
+    
+    if (view === 'grid') {
+        if (gridBtn) gridBtn.classList.add('active');
+        if (kanbanBtn) kanbanBtn.classList.remove('active');
+        if (gridContainer) gridContainer.style.display = 'grid';
+        if (kanbanContainer) kanbanContainer.style.display = 'none';
+        if (toolbar) toolbar.style.display = 'flex';
+        applyFiltersAndRender();
+    } else {
+        if (kanbanBtn) kanbanBtn.classList.add('active');
+        if (gridBtn) gridBtn.classList.remove('active');
+        if (gridContainer) gridContainer.style.display = 'none';
+        if (kanbanContainer) kanbanContainer.style.display = 'flex';
+        if (toolbar) toolbar.style.display = 'none'; // hide sort/filter toolbar to display pure kanban columns
+        applyFiltersAndRender();
+    }
+}
+
+function handleDragStart(event, id) {
+    event.dataTransfer.setData('text/plain', id);
+    event.dataTransfer.effectAllowed = 'move';
+}
+
+function allowDrop(event) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    const col = event.currentTarget;
+    if (col) col.classList.add('drag-over');
+}
+
+function handleDragLeave(event) {
+    const col = event.currentTarget;
+    if (col) col.classList.remove('drag-over');
+}
+
+function handleDrop(event, newStatus) {
+    event.preventDefault();
+    const col = event.currentTarget;
+    if (col) col.classList.remove('drag-over');
+    
+    const id = parseInt(event.dataTransfer.getData('text/plain'), 10);
+    if (!isNaN(id)) {
+        updateClientStatus(id, newStatus);
+    }
+}
+
+function renderKanban(clients) {
+    const statuses = ['Lead', 'Contacted', 'Won', 'Lost'];
+    
+    statuses.forEach(status => {
+        const listEl = document.getElementById(`cards-${status}`);
+        const countEl = document.getElementById(`count-${status}`);
+        if (listEl) listEl.innerHTML = '';
+        if (countEl) countEl.textContent = '0';
+    });
+    
+    statuses.forEach(status => {
+        const listEl = document.getElementById(`cards-${status}`);
+        const countEl = document.getElementById(`count-${status}`);
+        if (!listEl) return;
+        
+        const matchingClients = clients.filter(c => c.status === status);
+        if (countEl) countEl.textContent = matchingClients.length;
+        
+        if (matchingClients.length === 0) {
+            listEl.innerHTML = '<div class="kanban-empty">No clients</div>';
+            return;
+        }
+        
+        matchingClients.forEach(client => {
+            const dealFormatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(client.dealValue || 0);
+            const cardHTML = `
+                <div class="kanban-card" draggable="true" ondragstart="handleDragStart(event, ${client.id})" onclick="openDetailsModal(${client.id})">
+                    <div class="kanban-card-title">${escapeHTML(client.name)}</div>
+                    <div class="kanban-card-company">${escapeHTML(client.company)}</div>
+                    <div class="kanban-card-value">${dealFormatted}</div>
+                </div>
+            `;
+            listEl.insertAdjacentHTML('beforeend', cardHTML);
+        });
+    });
+}
+
+function exportClientsToCSV() {
+    const list = getVisibleClients();
+    if (list.length === 0) {
+        showToast('No clients to export', false);
+        return;
+    }
+    
+    const headers = ['ID', 'Name', 'Email', 'Phone', 'Company', 'Status', 'Deal Value', 'Created At'];
+    const rows = list.map(c => [
+        c.id,
+        c.name || '',
+        c.email || '',
+        c.phone || '',
+        c.company || '',
+        c.status || '',
+        c.dealValue || 0,
+        c.createdAt || ''
+    ]);
+    
+    const csvContent = [
+        headers.join(','),
+        ...rows.map(r => r.map(val => `"${String(val).replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `crm_clients_export_${new Date().toISOString().slice(0,10)}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showToast('CSV export downloaded ✓', true);
+}
+
+function loadMoreClients() {
+    currentPage++;
+    applyFiltersAndRender();
+}
+
+function handleGlobalKeydown(event) {
+    const activeEl = document.activeElement;
+    const isEditingInput = activeEl && (
+        activeEl.tagName === 'INPUT' || 
+        activeEl.tagName === 'TEXTAREA' || 
+        activeEl.tagName === 'SELECT' || 
+        activeEl.isContentEditable
+    );
+
+    if (event.key === 'Escape') {
+        closeAddClientModal();
+        closeDetailsModal();
+        return;
+    }
+
+    if (isEditingInput) return;
+
+    if (event.key === '/') {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            event.preventDefault();
+            searchInput.focus();
+            searchInput.select();
+        }
+    } else if (event.key.toLowerCase() === 'c' || event.key.toLowerCase() === 'n') {
+        openAddClientModal();
+    } else if (event.key.toLowerCase() === 'k' || event.key.toLowerCase() === 'v') {
+        switchView(currentView === 'grid' ? 'kanban' : 'grid');
+    }
+}
+
+// Make functions globally available
+window.switchView = switchView;
+window.handleDragStart = handleDragStart;
+window.allowDrop = allowDrop;
+window.handleDragLeave = handleDragLeave;
+window.handleDrop = handleDrop;
+window.renderKanban = renderKanban;
+window.exportClientsToCSV = exportClientsToCSV;
+window.loadMoreClients = loadMoreClients;
+window.handleGlobalKeydown = handleGlobalKeydown;

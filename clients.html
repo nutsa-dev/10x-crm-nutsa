@@ -39,7 +39,18 @@
             
             <div class="page-header-bar">
                 <h1>Clients Base</h1>
-                <button type="button" class="btn-submit-glass btn-add-client" onclick="openAddClientModal()">+ Add Client</button>
+                <div class="view-toggle-wrapper">
+                    <button type="button" class="btn-view-toggle active" id="viewToggleGrid" onclick="switchView('grid')">🎛️ Grid View</button>
+                    <button type="button" class="btn-view-toggle" id="viewToggleKanban" onclick="switchView('kanban')">📋 Kanban Board</button>
+                </div>
+                <div class="header-buttons" style="display: flex; gap: 1rem; align-items: center;">
+                    <button type="button" class="btn-export-csv" onclick="exportClientsToCSV()">📥 Export CSV</button>
+                    <button type="button" class="btn-submit-glass btn-add-client" onclick="openAddClientModal()">+ Add Client</button>
+                </div>
+            </div>
+            
+            <div class="shortcuts-legend" style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-align: right; width: 100%;">
+                Keyboard Shortcuts: <span><strong>[C]</strong> Add Client</span> &bull; <span><strong>[/]</strong> Focus Search</span> &bull; <span><strong>[K]</strong> Toggle Kanban</span> &bull; <span><strong>[Esc]</strong> Close Modals</span>
             </div>
             
             <div id="loadingIndicator" class="loading-box" style="display: none;">Loading clients...</div>
@@ -67,6 +78,29 @@
             </div>
 
             <div id="clientsContainer" class="clients-grid"></div>
+            
+            <div class="load-more-wrapper" id="loadMoreWrapper" style="display: none; margin: 2rem 0; text-align: center;">
+                <button type="button" class="btn-submit-glass btn-load-more" onclick="loadMoreClients()">Load More</button>
+            </div>
+
+            <div id="kanbanContainer" class="kanban-board" style="display: none;">
+                <div class="kanban-column" data-status="Lead" ondragover="allowDrop(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'Lead')">
+                    <div class="column-header lead-header">Lead <span class="column-count" id="count-Lead">0</span></div>
+                    <div class="kanban-cards" id="cards-Lead"></div>
+                </div>
+                <div class="kanban-column" data-status="Contacted" ondragover="allowDrop(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'Contacted')">
+                    <div class="column-header contacted-header">Contacted <span class="column-count" id="count-Contacted">0</span></div>
+                    <div class="kanban-cards" id="cards-Contacted"></div>
+                </div>
+                <div class="kanban-column" data-status="Won" ondragover="allowDrop(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'Won')">
+                    <div class="column-header won-header">Won <span class="column-count" id="count-Won">0</span></div>
+                    <div class="kanban-cards" id="cards-Won"></div>
+                </div>
+                <div class="kanban-column" data-status="Lost" ondragover="allowDrop(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'Lost')">
+                    <div class="column-header lost-header">Lost <span class="column-count" id="count-Lost">0</span></div>
+                    <div class="kanban-cards" id="cards-Lost"></div>
+                </div>
+            </div>
 
         </div>
     </main>
@@ -74,7 +108,7 @@
     <div class="modal-overlay" id="addClientModal" style="display: none;">
         <div class="card modal-card">
             <div class="modal-header">
-                <h2>Add New Client</h2>
+                <h2 id="addClientModalTitle">Add New Client</h2>
                 <button type="button" class="btn-close-modal" onclick="closeAddClientModal()">✕</button>
             </div>
             
@@ -113,7 +147,7 @@
                         <option value="Lost">Lost</option>
                     </select>
                 </div>
-                <button type="submit" class="btn-submit-glass">Create Client</button>
+                <button type="submit" id="addClientSubmitBtn" class="btn-submit-glass">Create Client</button>
             </form>
         </div>
     </div>
@@ -142,6 +176,15 @@
             <div class="info-item">
                 <span class="info-label">Phone Number</span>
                 <strong id="detPhone" class="info-value"></strong>
+            </div>
+        </div>
+
+        <div class="call-timer-section">
+            <h4 class="call-timer-title">Call Workspace</h4>
+            <div class="call-controls">
+                <button type="button" class="btn-call-start" id="startCallBtn" onclick="startCall()">📞 Start Call</button>
+                <button type="button" class="btn-call-end" id="endCallBtn" onclick="endCall()" disabled>🔴 End Call</button>
+                <span class="call-duration" id="callDurationDisplay">00:00</span>
             </div>
         </div>
 

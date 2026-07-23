@@ -107,7 +107,74 @@ function renderDashboardMetrics() {
     if (document.getElementById('barWon')) document.getElementById('barWon').style.width = `${(stageCounts.Won / maxCount) * 100}%`;
     if (document.getElementById('barLost')) document.getElementById('barLost').style.width = `${(stageCounts.Lost / maxCount) * 100}%`;
 
+    drawPipelineChart(stageCounts);
     renderRecentClientsTable(clients);
+}
+
+// Draw custom beautiful Canvas doughnut chart for pipeline infographic
+function drawPipelineChart(stageCounts) {
+    const canvas = document.getElementById('pipelineCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const stages = [
+        { label: 'Lead', count: stageCounts.Lead || 0, color: '#ff5500' },
+        { label: 'Contacted', count: stageCounts.Contacted || 0, color: '#f59e0b' },
+        { label: 'Proposal', count: stageCounts.Proposal || 0, color: '#8b5cf6' },
+        { label: 'Won', count: stageCounts.Won || 0, color: '#10b981' },
+        { label: 'Lost', count: stageCounts.Lost || 0, color: '#ef4444' }
+    ];
+    
+    const total = stages.reduce((sum, s) => sum + s.count, 0);
+    
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = Math.min(centerX, centerY) - 20;
+    const innerRadius = radius * 0.6;
+    
+    if (total === 0) {
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+        ctx.strokeStyle = '#d1d9e6';
+        ctx.lineWidth = radius - innerRadius;
+        ctx.stroke();
+        
+        ctx.font = 'bold 16px Inter, sans-serif';
+        ctx.fillStyle = '#636e72';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('No Clients', centerX, centerY);
+        return;
+    }
+    
+    let startAngle = -0.5 * Math.PI;
+    
+    stages.forEach(stage => {
+        if (stage.count === 0) return;
+        
+        const sliceAngle = (stage.count / total) * 2 * Math.PI;
+        
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, (radius + innerRadius) / 2, startAngle, startAngle + sliceAngle);
+        ctx.strokeStyle = stage.color;
+        ctx.lineWidth = radius - innerRadius;
+        ctx.stroke();
+        
+        startAngle += sliceAngle;
+    });
+    
+    ctx.font = 'bold 24px Inter, sans-serif';
+    ctx.fillStyle = document.body.classList.contains('dark-mode') ? '#f1f3f7' : '#2d3436';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(total, centerX, centerY - 10);
+    
+    ctx.font = '600 12px Inter, sans-serif';
+    ctx.fillStyle = '#828a99';
+    ctx.fillText('Total Clients', centerX, centerY + 15);
 }
 
 // 4. Populate top 5 recently registered clients

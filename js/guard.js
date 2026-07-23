@@ -17,6 +17,13 @@ const STORAGE_KEYS = {
 const Storage = {
     get(key, defaultValue = null) {
         try {
+            if (key === STORAGE_KEYS.SESSION) {
+                let data = sessionStorage.getItem(key);
+                if (!data) {
+                    data = localStorage.getItem(key);
+                }
+                return data ? JSON.parse(data) : defaultValue;
+            }
             const data = localStorage.getItem(key);
             return data ? JSON.parse(data) : defaultValue;
         } catch (error) {
@@ -24,8 +31,18 @@ const Storage = {
             return defaultValue;
         }
     },
-    set(key, value) {
+    set(key, value, persist = true) {
         try {
+            if (key === STORAGE_KEYS.SESSION) {
+                if (persist) {
+                    localStorage.setItem(key, JSON.stringify(value));
+                    sessionStorage.removeItem(key);
+                } else {
+                    sessionStorage.setItem(key, JSON.stringify(value));
+                    localStorage.removeItem(key);
+                }
+                return;
+            }
             localStorage.setItem(key, JSON.stringify(value));
         } catch (error) {
             console.error(`Error saving ${key} to storage:`, error);
@@ -33,6 +50,9 @@ const Storage = {
     },
     remove(key) {
         localStorage.removeItem(key);
+        if (key === STORAGE_KEYS.SESSION) {
+            sessionStorage.removeItem(key);
+        }
     }
 };
 

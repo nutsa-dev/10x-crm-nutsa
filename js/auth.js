@@ -96,13 +96,15 @@ function handleLogin(event) {
         return;
     }
 
-    // Save active session using our central Storage helper (P2.3)
+    const rememberMe = document.getElementById('rememberMe') ? document.getElementById('rememberMe').checked : false;
+
+    // Save active session using our central Storage helper (P2.3) with rememberMe value
     Storage.set(STORAGE_KEYS.SESSION, {
         userId: user.id,
         email: user.email,
         fullName: user.fullName,
         loginTime: new Date().toISOString()
-    });
+    }, rememberMe);
 
     window.location.href = 'dashboard.html';
 }
@@ -266,3 +268,46 @@ function handlePasswordReset(event) {
         window.location.href = 'index.html';
     }, 1800);
 }
+
+// Password strength indicator logic
+function handlePasswordInput(event) {
+    const password = event.target.value;
+    const container = document.getElementById('passwordStrengthContainer');
+    const bar = document.getElementById('strengthBar');
+    const text = document.getElementById('strengthText');
+    
+    if (!container || !bar || !text) return;
+    
+    if (!password) {
+        container.style.display = 'none';
+        return;
+    }
+    
+    container.style.display = 'flex';
+    
+    let score = 0;
+    if (password.length >= 8) score++;
+    if (/[a-z]/.test(password)) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
+    
+    let strength = 'weak';
+    if (score >= 4) {
+        strength = 'strong';
+    } else if (score >= 2) {
+        strength = 'medium';
+    }
+    
+    text.textContent = strength.charAt(0).toUpperCase() + strength.slice(1);
+    
+    bar.className = 'strength-bar';
+    bar.classList.add(strength);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const passwordInput = document.getElementById('password');
+    if (passwordInput && document.getElementById('passwordStrengthContainer')) {
+        passwordInput.addEventListener('input', handlePasswordInput);
+    }
+});

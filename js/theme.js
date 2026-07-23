@@ -53,6 +53,11 @@ function toggleTheme() {
     toggleBtns.forEach(btn => {
         btn.textContent = isDark ? '☀️' : '🌙';
     });
+    
+    // Refresh dashboard chart colors dynamically
+    if (typeof renderDashboardMetrics === 'function') {
+        renderDashboardMetrics();
+    }
 }
 
 // Make globally available for backward-compatibility with inline HTML events
