@@ -8,7 +8,7 @@
 const AUTH_RULES = {
     MIN_NAME_LENGTH: 3,
     MIN_PASSWORD_LENGTH: 8,
-    EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    EMAIL_REGEX: /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/
 };
 
 // ==========================================================================
@@ -310,4 +310,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (passwordInput && document.getElementById('passwordStrengthContainer')) {
         passwordInput.addEventListener('input', handlePasswordInput);
     }
+
+    // Block non-ASCII (Georgian, Cyrillic, etc.) characters in email fields on auth pages
+    ['loginEmail', 'email', 'resetEmail'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', function() {
+                this.value = this.value.replace(/[^\x00-\x7F]/g, '');
+            });
+        }
+    });
 });

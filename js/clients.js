@@ -8,7 +8,8 @@
 const CLIENT_RULES = {
     MIN_NAME_LENGTH: 3,
     MIN_DEAL_VALUE: 0,
-    EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    EMAIL_REGEX: /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/,
+    PHONE_REGEX: /^[0-9+\-() ]*$/
 };
 
 // Global state variables
@@ -38,6 +39,9 @@ async function initClients() {
 
     document.getElementById('searchInput')?.addEventListener('input', handleSearchInput);
     document.addEventListener('keydown', handleGlobalKeydown);
+
+    // Real-time input filters for email and phone fields
+    setupInputFilters();
 }
 
 // Fetch initial database of 30 mock clients from server (P4.2)
@@ -60,7 +64,7 @@ async function fetchClientsFromAPI() {
             return {
                 id: user.id,
                 name: fullName,
-                phone: user.phone || '+1 555-0192',
+                phone: user.phone || '',
                 email: user.email.toLowerCase(),
                 company: user.company ? user.company.name : 'Independent LLC',
                 image: user.image || 'https://dummyjson.com/icon/emilys/128',
@@ -196,7 +200,7 @@ async function performServerSearch(query) {
                 const newClient = {
                     id: user.id,
                     name: `${user.firstName} ${user.lastName}`.trim(),
-                    phone: user.phone || '+1 555-0192',
+                    phone: user.phone || '',
                     email: user.email.toLowerCase(),
                     company: user.company ? user.company.name : 'Independent LLC',
                     image: user.image || 'https://dummyjson.com/icon/emilys/128',
@@ -270,7 +274,7 @@ function renderClients(clients) {
                     </div>
                     <div class="card-info-row">
                         <span>Phone:</span>
-                        <strong>${escapeHTML(client.phone)}</strong>
+                        <strong>${escapeHTML(client.phone || 'N/A')}</strong>
                     </div>
                     <div class="card-info-row">
                         <span>Value:</span>
@@ -480,8 +484,18 @@ document.getElementById('clientDetailsModal')?.addEventListener('click', functio
 function openAddClientModal() {
     const modal = document.getElementById('addClientModal');
     if (modal) {
-        modal.style.display = 'flex';
+        // Reset form FIRST to clear any stale values (fixes 'null' placeholder bug from C shortcut)
+        const form = document.getElementById('addClientForm');
+        if (form) form.reset();
         clearClientFormErrors();
+        editingClientId = null;
+
+        const titleEl = document.getElementById('addClientModalTitle');
+        const submitBtn = document.getElementById('addClientSubmitBtn');
+        if (titleEl) titleEl.textContent = 'Add New Client';
+        if (submitBtn) submitBtn.textContent = 'Create Client';
+
+        modal.style.display = 'flex';
     }
 }
 
@@ -493,7 +507,7 @@ function openEditClientModal(id) {
 
     document.getElementById('clientName').value = client.name || '';
     document.getElementById('clientEmail').value = client.email || '';
-    document.getElementById('clientPhone').value = client.phone !== '+1 555-0192' ? (client.phone || '') : '';
+    document.getElementById('clientPhone').value = client.phone || '';
     document.getElementById('clientCompany').value = client.company || '';
     document.getElementById('clientDealValue').value = client.dealValue || '';
     document.getElementById('clientStatus').value = client.status || 'Lead';
@@ -602,7 +616,7 @@ async function handleAddClient(event) {
                         ...c,
                         name: name,
                         email: email,
-                        phone: phone || '+1 555-0192',
+                        phone: phone,
                         company: company,
                         dealValue: dealValue,
                         status: status
@@ -644,7 +658,7 @@ async function handleAddClient(event) {
             id: Date.now(),
             name: name,
             email: email,
-            phone: phone || '+1 555-0192',
+            phone: phone,
             company: company,
             image: serverUser.image || 'https://dummyjson.com/icon/emilys/128',
             status: status,
@@ -672,6 +686,47 @@ function showClientError(inputId, errorId, message) {
         input.classList.add('input-error');
         err.textContent = message;
     }
+}
+
+// Real-time input filters: block Georgian/non-ASCII in email, block letters in phone
+function setupInputFilters() {
+    const emailInput = document.getElementById('clientEmail');
+    const phoneInput = document.getElementById('clientPhone');
+
+    if (emailInput) {
+        emailInput.addEventListener('input', function() {
+            // Strip any non-ASCII characters (Georgian, Cyrillic, etc.)
+            this.value = this.value.replace(/[^\x00-\x7F]/g, '');
+            // Clear error when user starts typing valid input
+            clearSingleFieldError('clientEmail', 'clientEmailError');
+        });
+    }
+
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function() {
+            // Allow only digits, +, -, (, ), and spaces
+            this.value = this.value.replace(/[^0-9+\-() ]/g, '');
+            clearSingleFieldError('clientPhone', 'clientPhoneError');
+        });
+    }
+
+    // Clear stale errors on all other form fields too
+    ['clientName', 'clientCompany', 'clientDealValue'].forEach(fieldId => {
+        const el = document.getElementById(fieldId);
+        if (el) {
+            el.addEventListener('input', function() {
+                const errorId = fieldId + 'Error';
+                clearSingleFieldError(fieldId, errorId);
+            });
+        }
+    });
+}
+
+function clearSingleFieldError(inputId, errorId) {
+    const input = document.getElementById(inputId);
+    const err = document.getElementById(errorId);
+    if (input) input.classList.remove('input-error');
+    if (err) err.textContent = '';
 }
 
 // Send DELETE request on client removal as required by PRD
