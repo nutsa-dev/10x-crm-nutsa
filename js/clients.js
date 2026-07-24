@@ -19,6 +19,7 @@ let currentFilterStatus = 'All';
 let currentSearchQuery = '';
 let currentSortOption = 'Newest';
 let currentView = 'grid';
+let shouldAnimateKanban = true;
 let currentPage = 1;
 const itemsPerPage = 8;
 
@@ -789,8 +790,10 @@ function renderKanban(clients) {
         
         matchingClients.forEach(client => {
             const dealFormatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(client.dealValue || 0);
+            const animationClass = shouldAnimateKanban ? 'animate-entrance' : '';
+            const animationDelay = shouldAnimateKanban ? `style="animation-delay: ${globalCardIndex * 0.05}s;"` : '';
             const cardHTML = `
-                <div class="kanban-card" style="animation-delay: ${globalCardIndex * 0.05}s;" draggable="true" ondragstart="handleDragStart(event, ${client.id})" onclick="openDetailsModal(${client.id})">
+                <div class="kanban-card ${animationClass}" ${animationDelay} draggable="true" ondragstart="handleDragStart(event, ${client.id})" onclick="openDetailsModal(${client.id})">
                     <div class="kanban-card-title">${escapeHTML(client.name)}</div>
                     <div class="kanban-card-company">${escapeHTML(client.company)}</div>
                     <div class="kanban-card-value">${dealFormatted}</div>
@@ -800,6 +803,9 @@ function renderKanban(clients) {
             globalCardIndex++;
         });
     });
+    
+    // Disable animation after the first render (e.g. during active drag & drops)
+    shouldAnimateKanban = false;
 }
 
 function exportClientsToCSV() {
