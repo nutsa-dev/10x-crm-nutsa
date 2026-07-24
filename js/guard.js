@@ -115,11 +115,12 @@ window.logout = logout;
 
 // Route checking supporting both HTML extensions and extensionless paths (Netlify/Vercel)
 const currentPath = window.location.pathname.toLowerCase();
+const lastSegment = currentPath.split('/').pop() || 'index.html';
 const protectedRoutes = ['dashboard', 'clients', 'profile'];
 const publicRoutes = ['index', 'signup', 'forgot-password'];
 
-const isProtectedRoute = protectedRoutes.some(route => currentPath.includes(route));
-const isPublicRoute = publicRoutes.some(route => currentPath.includes(route)) || currentPath === '/' || currentPath.endsWith('/');
+const isProtectedRoute = protectedRoutes.some(route => lastSegment.includes(route));
+const isPublicRoute = publicRoutes.some(route => lastSegment.includes(route)) || lastSegment === '' || currentPath === '/' || currentPath.endsWith('/');
 
 if (isProtectedRoute) {
     checkAuthForProtectedRoute();

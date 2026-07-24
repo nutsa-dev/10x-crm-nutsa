@@ -92,6 +92,10 @@
                     <div class="column-header contacted-header">Contacted <span class="column-count" id="count-Contacted">0</span></div>
                     <div class="kanban-cards" id="cards-Contacted"></div>
                 </div>
+                <div class="kanban-column" data-status="Proposal" ondragover="allowDrop(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'Proposal')">
+                    <div class="column-header proposal-header">Proposal <span class="column-count" id="count-Proposal">0</span></div>
+                    <div class="kanban-cards" id="cards-Proposal"></div>
+                </div>
                 <div class="kanban-column" data-status="Won" ondragover="allowDrop(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'Won')">
                     <div class="column-header won-header">Won <span class="column-count" id="count-Won">0</span></div>
                     <div class="kanban-cards" id="cards-Won"></div>
@@ -143,6 +147,7 @@
                     <select id="clientStatus" class="form-input-neo custom-select">
                         <option value="Lead" selected>Lead</option>
                         <option value="Contacted">Contacted</option>
+                        <option value="Proposal">Proposal</option>
                         <option value="Won">Won</option>
                         <option value="Lost">Lost</option>
                     </select>

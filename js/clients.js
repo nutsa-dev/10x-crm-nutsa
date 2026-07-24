@@ -185,37 +185,35 @@ async function performServerSearch(query) {
         const data = await response.json();
         
         const localClients = Storage.get(STORAGE_KEYS.CLIENTS, []);
+        const updatedLocalClients = [...localClients];
+        let hasNewClients = false;
         
-        const serverClients = data.users.map(user => {
+        data.users.forEach(user => {
             const localMatch = localClients.find(lc => lc.id === user.id);
-            if (localMatch) {
-                return localMatch;
+            if (!localMatch) {
+                const randomDealValue = Math.floor(Math.random() * (10000 - 500 + 1)) + 500;
+                const newClient = {
+                    id: user.id,
+                    name: `${user.firstName} ${user.lastName}`.trim(),
+                    phone: user.phone || '+1 555-0192',
+                    email: user.email.toLowerCase(),
+                    company: user.company ? user.company.name : 'Independent LLC',
+                    image: user.image || 'https://dummyjson.com/icon/emilys/128',
+                    status: 'Lead',
+                    dealValue: randomDealValue,
+                    notes: [],
+                    createdAt: new Date(Date.now() - Math.random() * 10 * 24 * 60 * 60 * 1000).toISOString()
+                };
+                updatedLocalClients.push(newClient);
+                hasNewClients = true;
             }
-            
-            const randomDealValue = Math.floor(Math.random() * (10000 - 500 + 1)) + 500;
-            return {
-                id: user.id,
-                name: `${user.firstName} ${user.lastName}`.trim(),
-                phone: user.phone || '+1 555-0192',
-                email: user.email.toLowerCase(),
-                company: user.company ? user.company.name : 'Independent LLC',
-                image: user.image || 'https://dummyjson.com/icon/emilys/128',
-                status: 'Lead',
-                dealValue: randomDealValue,
-                notes: [],
-                createdAt: new Date(Date.now() - Math.random() * 10 * 24 * 60 * 60 * 1000).toISOString()
-            };
         });
         
-        const localMatchingOnly = localClients.filter(lc => {
-            if (serverClients.some(sc => sc.id === lc.id)) return false;
-            const q = query.toLowerCase();
-            return (lc.name && lc.name.toLowerCase().includes(q)) || 
-                   (lc.company && lc.company.toLowerCase().includes(q)) ||
-                   (lc.email && lc.email.toLowerCase().includes(q));
-        });
+        if (hasNewClients) {
+            Storage.set(STORAGE_KEYS.CLIENTS, updatedLocalClients);
+        }
         
-        clientsState = [...localMatchingOnly, ...serverClients];
+        clientsState = updatedLocalClients;
         applyFiltersAndRender();
     } catch (error) {
         console.error('Server search failed:', error);
@@ -283,6 +281,7 @@ function renderClients(clients) {
                     <select class="select-status-inline" onchange="updateClientStatus(${client.id}, this.value)">
                         <option value="Lead" ${client.status === 'Lead' ? 'selected' : ''}>Lead</option>
                         <option value="Contacted" ${client.status === 'Contacted' ? 'selected' : ''}>Contacted</option>
+                        <option value="Proposal" ${client.status === 'Proposal' ? 'selected' : ''}>Proposal</option>
                         <option value="Won" ${client.status === 'Won' ? 'selected' : ''}>Won</option>
                         <option value="Lost" ${client.status === 'Lost' ? 'selected' : ''}>Lost</option>
                     </select>
@@ -763,7 +762,7 @@ function handleDrop(event, newStatus) {
 }
 
 function renderKanban(clients) {
-    const statuses = ['Lead', 'Contacted', 'Won', 'Lost'];
+    const statuses = ['Lead', 'Contacted', 'Proposal', 'Won', 'Lost'];
     
     statuses.forEach(status => {
         const listEl = document.getElementById(`cards-${status}`);
