@@ -1,0 +1,906 @@
+/* ==========================================================================
+   RESPONSIVE STYLES — 10X CRM
+   Comprehensive mobile & tablet breakpoints for all pages.
+   Loaded AFTER style.css to override desktop defaults.
+   ========================================================================== */
+
+/* ==========================================================================
+   TABLET — max-width: 1024px
+   ========================================================================== */
+@media (max-width: 1024px) {
+
+    /* Base font scaling */
+    html, body {
+        font-size: 17px;
+    }
+
+    /* Header: stack nav under brand */
+    .header-container {
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        padding: 1rem 0 !important;
+    }
+
+    .brand {
+        font-size: 1.8rem;
+    }
+
+    .nav-menu {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        gap: 0.6rem;
+    }
+
+    .nav-link {
+        font-size: 1.05rem;
+        padding: 0.7rem 1.2rem;
+    }
+
+    .header-actions {
+        gap: 0.8rem;
+    }
+
+    /* Dashboard */
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 1.2rem !important;
+    }
+
+    .dashboard-bottom-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem !important;
+    }
+
+    .dashboard-body {
+        height: auto !important;
+        overflow: auto !important;
+    }
+
+    .welcome-section h1 {
+        font-size: 2rem;
+    }
+
+    /* Clients page header */
+    .page-header-bar {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .view-toggle-wrapper {
+        margin-right: 0 !important;
+    }
+
+    /* Kanban horizontal scroll on tablet */
+    .kanban-board {
+        min-height: 400px;
+    }
+
+    .kanban-column {
+        min-width: 240px;
+    }
+
+    /* Profile grid */
+    .profile-layout-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Client grid */
+    .clients-grid {
+        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    }
+
+    /* Auth pages */
+    .auth-body .card {
+        padding: 50px 40px !important;
+        max-width: 600px !important;
+    }
+
+    .auth-body h2 {
+        font-size: 32px !important;
+    }
+
+    .auth-body label {
+        font-size: 22px !important;
+        margin: 16px 0 10px 16px !important;
+    }
+
+    .auth-body .form-input-neo {
+        padding: 18px 22px !important;
+        font-size: 18px !important;
+    }
+
+    .auth-body .btn-submit-glass {
+        padding: 18px 30px !important;
+        font-size: 22px !important;
+    }
+
+    .link {
+        font-size: 20px !important;
+        margin-top: 36px !important;
+    }
+}
+
+/* ==========================================================================
+   MOBILE LANDSCAPE & SMALL TABLETS — max-width: 768px
+   ========================================================================== */
+@media (max-width: 768px) {
+
+    html, body {
+        font-size: 15px;
+    }
+
+    /* Header fully stacked */
+    .header-container {
+        flex-direction: column !important;
+        gap: 0.8rem !important;
+        padding: 0.8rem 0 !important;
+    }
+
+    .nav-menu {
+        width: 100% !important;
+        justify-content: center !important;
+        gap: 0.4rem !important;
+    }
+
+    .nav-link {
+        font-size: 0.95rem;
+        padding: 0.6rem 1rem;
+    }
+
+    .header-actions {
+        width: 100% !important;
+        justify-content: center !important;
+        gap: 0.8rem !important;
+    }
+
+    .live-clock {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .btn-theme, .btn-logout {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.95rem;
+    }
+
+    /* Page titles */
+    .page-header-bar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 1rem !important;
+    }
+
+    .page-header-bar h1 {
+        font-size: 1.8rem !important;
+        text-align: center !important;
+    }
+
+    /* View toggle & buttons */
+    .view-toggle-wrapper {
+        justify-content: center !important;
+        margin-right: 0 !important;
+    }
+
+    .header-buttons {
+        flex-direction: column !important;
+        width: 100% !important;
+        align-items: stretch !important;
+    }
+
+    .btn-export-csv, .btn-add-client {
+        width: 100% !important;
+        text-align: center !important;
+        justify-content: center !important;
+    }
+
+    /* Shortcuts legend */
+    .shortcuts-legend {
+        text-align: center !important;
+        font-size: 0.95rem !important;
+    }
+
+    /* Toolbar */
+    .toolbar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        padding: 1.2rem !important;
+        gap: 1rem !important;
+    }
+
+    .search-box-wrapper {
+        min-width: 100% !important;
+    }
+
+    .filter-chips {
+        justify-content: center !important;
+        width: 100% !important;
+    }
+
+    .sort-select {
+        width: 100% !important;
+        min-width: auto !important;
+    }
+
+    /* Clients grid → single column */
+    .clients-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem;
+    }
+
+    /* Kanban board scrollable */
+    .kanban-board {
+        gap: 1rem;
+        padding: 8px;
+        min-height: 350px;
+    }
+
+    .kanban-column {
+        min-width: 220px;
+        padding: 1rem;
+    }
+
+    .column-header {
+        font-size: 1.15rem;
+    }
+
+    /* Dashboard */
+    .dashboard-container {
+        padding: 1rem 0 !important;
+        gap: 1rem !important;
+    }
+
+    .welcome-section {
+        padding: 1.2rem !important;
+    }
+
+    .welcome-section h1 {
+        font-size: 1.7rem !important;
+        text-align: center !important;
+    }
+
+    .pipeline-section, .recent-clients-section {
+        padding: 1.2rem !important;
+    }
+
+    .pipeline-section h2, .section-header h2 {
+        font-size: 1.3rem !important;
+    }
+
+    /* Modals — full width on mobile */
+    .card.modal-card {
+        padding: 2rem !important;
+        width: 95% !important;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-card-wide {
+        max-width: 95% !important;
+    }
+
+    .modal-header h2 {
+        font-size: 1.6rem !important;
+    }
+
+    /* Details modal — stack profile banner */
+    .details-profile-banner {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+        padding: 1.2rem !important;
+    }
+
+    .details-avatar {
+        width: 70px;
+        height: 70px;
+    }
+
+    .details-name {
+        font-size: 1.4rem;
+    }
+
+    /* Call controls wrap */
+    .call-controls {
+        flex-wrap: wrap !important;
+    }
+
+    .call-duration {
+        width: 100% !important;
+        text-align: center !important;
+        margin-top: 0.5rem !important;
+        margin-left: 0 !important;
+    }
+
+    /* Add note row stack */
+    .add-note-row {
+        flex-direction: column;
+    }
+
+    .note-input {
+        width: 100%;
+    }
+
+    .btn-add-note {
+        width: 100% !important;
+    }
+
+    .btn-reminder {
+        font-size: 16px !important;
+        padding: 16px 24px !important;
+    }
+
+    /* Profile page */
+    .profile-layout-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem !important;
+    }
+
+    .profile-card {
+        padding: 2rem !important;
+    }
+
+    .profile-header-info {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .profile-user-details h2 {
+        text-align: center !important;
+        font-size: 1.8rem !important;
+    }
+
+    .user-email-text, .profile-meta {
+        text-align: center;
+    }
+
+    .profile-card h3 {
+        font-size: 1.35rem;
+        text-align: center;
+    }
+
+    /* Auth pages — tighter on tablet */
+    .auth-body .card {
+        padding: 36px 28px !important;
+        max-width: 100% !important;
+    }
+
+    .auth-body h2 {
+        font-size: 28px !important;
+    }
+
+    .auth-body label {
+        font-size: 18px !important;
+        margin: 14px 0 8px 12px !important;
+    }
+
+    .auth-body .form-input-neo {
+        padding: 16px 18px !important;
+        font-size: 16px !important;
+    }
+
+    .auth-body .btn-submit-glass {
+        padding: 16px 26px !important;
+        font-size: 20px !important;
+    }
+
+    .auth-body .error-text {
+        font-size: 15px;
+        margin-left: 12px;
+    }
+
+    .link {
+        font-size: 17px !important;
+        margin-top: 28px !important;
+    }
+
+    .card-subtitle {
+        font-size: 16px;
+    }
+
+    .auth-body .card-subtitle {
+        font-size: 16px;
+        margin-bottom: 24px;
+    }
+
+    /* Fixed theme button on auth pages — smaller */
+    .fixed-theme-wrapper {
+        top: 16px;
+        right: 16px;
+    }
+
+    .btn-theme-fixed {
+        width: 48px;
+        height: 48px;
+        font-size: 22px;
+    }
+
+    /* Data table responsiveness */
+    .data-table th {
+        font-size: 0.95rem;
+        padding: 0.8rem 0.6rem;
+    }
+
+    .data-table td {
+        padding: 0.9rem 0.6rem;
+        font-size: 1.05rem;
+    }
+
+    .data-table td strong {
+        font-size: 1.1rem;
+    }
+}
+
+/* ==========================================================================
+   MOBILE PORTRAIT — max-width: 576px
+   ========================================================================== */
+@media (max-width: 576px) {
+
+    html, body {
+        font-size: 14px;
+    }
+
+    /* Container tighter padding */
+    .container {
+        width: 100% !important;
+        padding: 0 12px !important;
+    }
+
+    .dashboard-container {
+        width: 100% !important;
+        padding: 0.8rem 12px !important;
+    }
+
+    .header-container {
+        width: 100% !important;
+        padding: 0.6rem 12px !important;
+    }
+
+    .main-content {
+        padding: 1.5rem 0;
+    }
+
+    /* Dashboard metrics single column */
+    .metrics-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .metric-card {
+        padding: 1rem !important;
+        gap: 1rem !important;
+    }
+
+    .metric-icon {
+        width: 48px !important;
+        height: 48px !important;
+    }
+
+    .metric-icon svg {
+        width: 18px !important;
+        height: 18px !important;
+    }
+
+    .metric-value {
+        font-size: 1.5rem !important;
+    }
+
+    .metric-label {
+        font-size: 0.75rem !important;
+    }
+
+    .welcome-section h1 {
+        font-size: 1.4rem !important;
+    }
+
+    /* Section headers */
+    .section-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.6rem !important;
+    }
+
+    .section-header h2 {
+        font-size: 1.2rem !important;
+    }
+
+    .link-view-all {
+        font-size: 1rem;
+    }
+
+    /* Data table — smaller text */
+    .data-table th, .data-table td {
+        padding: 0.7rem 0.4rem !important;
+        font-size: 0.9rem !important;
+    }
+
+    .data-table td strong {
+        font-size: 1rem !important;
+    }
+
+    .status-badge {
+        padding: 0.35rem 0.7rem !important;
+        font-size: 0.85rem !important;
+    }
+
+    /* Pipeline chart */
+    .pipeline-chart-wrapper canvas {
+        max-width: 200px !important;
+    }
+
+    .info-name {
+        font-size: 1rem;
+    }
+
+    .info-val {
+        font-size: 1.05rem;
+    }
+
+    /* Client cards — tighter */
+    .client-card {
+        padding: 1rem !important;
+    }
+
+    .client-avatar {
+        width: 55px !important;
+        height: 55px !important;
+    }
+
+    .client-title-info h3 {
+        font-size: 1.2rem;
+    }
+
+    .client-company-name {
+        font-size: 0.9rem;
+    }
+
+    .deal-value-text {
+        font-size: 1.15rem !important;
+    }
+
+    /* Client card footer — stack on small mobile */
+    .client-card-footer {
+        flex-wrap: wrap !important;
+        gap: 0.6rem !important;
+    }
+
+    .select-status-inline, .btn-edit-client, .btn-delete-client {
+        width: 100% !important;
+        text-align: center !important;
+        justify-content: center !important;
+    }
+
+    /* Kanban */
+    .kanban-board {
+        min-height: 300px;
+        gap: 0.8rem;
+    }
+
+    .kanban-column {
+        min-width: 200px;
+        padding: 0.8rem;
+    }
+
+    .kanban-card {
+        padding: 0.8rem;
+    }
+
+    .kanban-card-title {
+        font-size: 1.05rem;
+    }
+
+    .column-header {
+        font-size: 1rem;
+    }
+
+    /* Modals — nearly full screen */
+    .card.modal-card {
+        padding: 1.5rem !important;
+        width: 96% !important;
+        margin: 8px !important;
+        border-radius: var(--radius-md) !important;
+    }
+
+    .modal-header h2 {
+        font-size: 1.3rem !important;
+    }
+
+    .btn-close-modal {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+
+    /* Details modal */
+    .details-avatar {
+        width: 60px;
+        height: 60px;
+    }
+
+    .details-name {
+        font-size: 1.2rem;
+    }
+
+    .details-company {
+        font-size: 0.95rem;
+    }
+
+    .info-item {
+        padding: 0.9rem 1.2rem;
+    }
+
+    .info-label {
+        font-size: 0.85rem;
+    }
+
+    .info-value {
+        font-size: 1rem;
+    }
+
+    /* Notes */
+    .notes-list-box {
+        max-height: 200px;
+        padding: 0.8rem 1rem;
+    }
+
+    .note-input {
+        padding: 14px 18px !important;
+        font-size: 16px !important;
+    }
+
+    .btn-add-note {
+        padding: 14px 20px !important;
+        font-size: 16px !important;
+    }
+
+    .btn-reminder {
+        padding: 14px 20px !important;
+        font-size: 14px !important;
+    }
+
+    /* Profile page */
+    .avatar-circle {
+        width: 80px;
+        height: 80px;
+        font-size: 2.2rem;
+    }
+
+    .profile-user-details h2 {
+        font-size: 1.5rem !important;
+    }
+
+    .profile-card {
+        padding: 1.5rem !important;
+    }
+
+    .profile-card h3 {
+        font-size: 1.2rem;
+    }
+
+    /* Auth pages — compact mobile */
+    .auth-body {
+        padding: 16px;
+        align-items: flex-start;
+        padding-top: 60px;
+    }
+
+    .auth-body .card {
+        padding: 28px 20px !important;
+        border-radius: var(--radius-md) !important;
+    }
+
+    .auth-body h2 {
+        font-size: 24px !important;
+    }
+
+    .auth-body label {
+        font-size: 16px !important;
+        margin: 12px 0 6px 8px !important;
+    }
+
+    .auth-body .form-input-neo {
+        padding: 14px 16px !important;
+        font-size: 15px !important;
+    }
+
+    .auth-body .btn-submit-glass {
+        padding: 14px 20px !important;
+        font-size: 17px !important;
+        margin-top: 16px !important;
+    }
+
+    .auth-body .card-subtitle {
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    .link {
+        font-size: 14px !important;
+        margin-top: 20px !important;
+    }
+
+    .auth-body .error-text {
+        font-size: 13px;
+        margin-left: 8px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    /* Password strength */
+    .password-strength-container {
+        margin-top: 8px;
+    }
+
+    /* Fixed theme button — smaller mobile */
+    .fixed-theme-wrapper {
+        top: 12px;
+        right: 12px;
+    }
+
+    .btn-theme-fixed {
+        width: 42px;
+        height: 42px;
+        font-size: 18px;
+    }
+
+    /* Call controls stack */
+    .btn-call-start, .btn-call-end {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+
+    .call-timer-title {
+        font-size: 1.05rem;
+    }
+
+    /* Toolbar chips smaller */
+    .filter-chips .chip {
+        padding: 0.6rem 1.1rem;
+        font-size: 0.95rem;
+    }
+
+    /* Shortcuts legend hide on very small screens */
+    .shortcuts-legend {
+        font-size: 0.8rem !important;
+        line-height: 1.8;
+    }
+
+    /* Form inputs global */
+    .form-input-neo {
+        padding: 14px 16px;
+        font-size: 16px;
+    }
+
+    .btn-submit-glass {
+        padding: 14px 24px;
+        font-size: 17px;
+    }
+}
+
+/* ==========================================================================
+   VERY SMALL MOBILE — max-width: 400px
+   ========================================================================== */
+@media (max-width: 400px) {
+
+    html, body {
+        font-size: 13px;
+    }
+
+    .brand {
+        font-size: 1.4rem;
+    }
+
+    .nav-link {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.7rem;
+    }
+
+    .page-header-bar h1 {
+        font-size: 1.5rem !important;
+    }
+
+    /* Auth even more compact */
+    .auth-body .card {
+        padding: 24px 16px !important;
+    }
+
+    .auth-body h2 {
+        font-size: 22px !important;
+    }
+
+    /* Kanban single-column scroll */
+    .kanban-column {
+        min-width: 180px;
+    }
+
+    .kanban-card-title {
+        font-size: 0.95rem;
+    }
+
+    .kanban-card-value {
+        font-size: 0.9rem;
+    }
+
+    /* Toast */
+    .toast {
+        font-size: 0.9rem;
+        padding: 0.7rem 1.4rem;
+        width: 90%;
+        text-align: center;
+    }
+
+    /* Shortcuts legend - hide keyboard label, only show keys */
+    .shortcuts-legend {
+        font-size: 0.75rem !important;
+    }
+
+    /* Profile avatar smaller */
+    .avatar-circle {
+        width: 65px;
+        height: 65px;
+        font-size: 1.8rem;
+    }
+}
+
+/* ==========================================================================
+   LANDSCAPE ORIENTATION — ensure dashboard scrolls
+   ========================================================================== */
+@media (max-height: 700px) and (orientation: landscape) {
+    .dashboard-body {
+        height: auto !important;
+        overflow: auto !important;
+    }
+
+    .dashboard-container {
+        gap: 0.8rem !important;
+    }
+
+    .welcome-section {
+        padding: 0.8rem 1.2rem !important;
+    }
+
+    .welcome-section h1 {
+        font-size: 1.4rem !important;
+    }
+
+    .metric-card {
+        padding: 0.8rem 1rem !important;
+    }
+}
+
+/* ==========================================================================
+   PRINT STYLES — clean print for reports
+   ========================================================================== */
+@media print {
+    .app-header,
+    .fixed-theme-wrapper,
+    .btn-theme,
+    .btn-logout,
+    .btn-add-client,
+    .btn-export-csv,
+    .toolbar,
+    .shortcuts-legend,
+    .toast,
+    .modal-overlay {
+        display: none !important;
+    }
+
+    body {
+        background: white !important;
+        color: black !important;
+        font-size: 12pt !important;
+    }
+
+    .client-card, .metric-card, .profile-card {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+        break-inside: avoid;
+    }
+
+    .clients-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
