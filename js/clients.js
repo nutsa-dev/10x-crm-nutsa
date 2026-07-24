@@ -774,7 +774,6 @@ function renderKanban(clients) {
         if (countEl) countEl.textContent = '0';
     });
     
-    let globalCardIndex = 0;
     statuses.forEach(status => {
         const listEl = document.getElementById(`cards-${status}`);
         const countEl = document.getElementById(`count-${status}`);
@@ -788,10 +787,12 @@ function renderKanban(clients) {
             return;
         }
         
+        // Per-column index so all columns animate simultaneously
+        let columnCardIndex = 0;
         matchingClients.forEach(client => {
             const dealFormatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(client.dealValue || 0);
             const animationClass = shouldAnimateKanban ? 'animate-entrance' : '';
-            const animationDelay = shouldAnimateKanban ? `style="animation-delay: ${globalCardIndex * 0.05}s;"` : '';
+            const animationDelay = shouldAnimateKanban ? `style="animation-delay: ${columnCardIndex * 0.05}s;"` : '';
             const cardHTML = `
                 <div class="kanban-card ${animationClass}" ${animationDelay} draggable="true" ondragstart="handleDragStart(event, ${client.id})" onclick="openDetailsModal(${client.id})">
                     <div class="kanban-card-title">${escapeHTML(client.name)}</div>
@@ -800,7 +801,7 @@ function renderKanban(clients) {
                 </div>
             `;
             listEl.insertAdjacentHTML('beforeend', cardHTML);
-            globalCardIndex++;
+            columnCardIndex++;
         });
     });
     
