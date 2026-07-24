@@ -22,13 +22,13 @@
     --text-muted: #636e72;
     
     /* Soft Neumorphic Shadows (Soft 3D) */
-    --neo-shadow-out: 4px 4px 8px #d1d9e6, -4px -4px 8px #ffffff;
-    --neo-shadow-in: inset 3px 3px 5px #d1d9e6, inset -3px -3px 5px #ffffff;
-    --neo-shadow-card-hover: 6px 6px 14px #c2cbdc, -6px -6px 14px #ffffff;
+    --neo-shadow-out: 3px 3px 6px #d1d9e6, -3px -3px 6px #ffffff;
+    --neo-shadow-in: inset 2px 2px 4px #d1d9e6, inset -2px -2px 4px #ffffff;
+    --neo-shadow-card-hover: 5px 5px 12px #c2cbdc, -5px -5px 12px #ffffff;
 
-    --radius-lg: 16px;
-    --radius-md: 10px;
-    --radius-sm: 7px;
+    --radius-lg: 14px;
+    --radius-md: 8px;
+    --radius-sm: 6px;
 }
 
 /* Dark Mode Overrides */
@@ -40,9 +40,9 @@ body.dark-mode {
     --text-main: #f1f3f7;
     --text-muted: #828a99;
     
-    --neo-shadow-out: 4px 4px 10px #0e0f12, -4px -4px 10px #22252e;
-    --neo-shadow-in: inset 3px 3px 5px #0e0f12, inset -3px -3px 5px #22252e;
-    --neo-shadow-card-hover: 6px 6px 14px #0a0b0d, -6px -6px 14px #262933;
+    --neo-shadow-out: 3px 3px 8px #0e0f12, -3px -3px 8px #22252e;
+    --neo-shadow-in: inset 2px 2px 4px #0e0f12, inset -2px -2px 4px #22252e;
+    --neo-shadow-card-hover: 5px 5px 12px #0a0b0d, -5px -5px 12px #262933;
 }
 
 /* ==========================================================================
@@ -65,7 +65,7 @@ html, body {
     min-height: 100vh;
     background-color: var(--bg-color) !important;
     color: var(--text-main);
-    font-size: 13px;
+    font-size: 12px;
     line-height: 1.5;
     overflow-x: hidden;
 }
@@ -103,8 +103,8 @@ button, input, select, textarea {
 
 /* Base Containers */
 .container {
-    max-width: 1280px !important;
-    width: 92% !important;
+    max-width: 1440px !important;
+    width: 82% !important;
     margin: 0 auto !important;
     padding: 0 !important;
     box-sizing: border-box;
@@ -112,7 +112,7 @@ button, input, select, textarea {
 
 .main-content {
     flex: 1;
-    padding: 1.4rem 0;
+    padding: 1.2rem 0;
 }
 
 .app-body {
@@ -146,9 +146,9 @@ button, input, select, textarea {
 }
 
 .btn-theme-fixed {
-    width: 38px;
-    height: 38px;
-    font-size: 16px;
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
     background: var(--bg-color);
     border: none;
     border-radius: var(--radius-sm) !important;
@@ -172,66 +172,66 @@ button, input, select, textarea {
     background: var(--bg-color);
     border-radius: var(--radius-lg);
     box-shadow: var(--neo-shadow-out);
-    padding: 1.4rem;
-    margin-bottom: 1.2rem;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
 }
 
 .auth-body .card {
-    padding: 36px 32px !important;
+    padding: 32px 28px !important;
     width: 100%;
-    max-width: 430px !important;
+    max-width: 400px !important;
 }
 
 h2 {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 800;
     letter-spacing: -0.5px;
-    margin-bottom: 7px;
+    margin-bottom: 6px;
     color: var(--text-main);
 }
 
 .auth-body h2 {
-    font-size: 26px !important;
+    font-size: 22px !important;
     text-align: center;
 }
 
 .card-subtitle {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     color: var(--text-muted);
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .auth-body .card-subtitle {
     text-align: center;
-    font-size: 13px;
-    margin-bottom: 20px;
+    font-size: 12px;
+    margin-bottom: 18px;
 }
 
 .form-group {
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     display: flex;
     flex-direction: column;
 }
 
 label {
     display: block;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 800;
-    margin-bottom: 5px;
-    margin-left: 4px;
+    margin-bottom: 4px;
+    margin-left: 3px;
     color: var(--text-main);
 }
 
 .auth-body label {
-    font-size: 16px !important;
-    margin: 12px 0 7px 12px !important;
+    font-size: 14px !important;
+    margin: 10px 0 5px 10px !important;
 }
 
 .form-input-neo {
     width: 100%;
-    padding: 11px 14px;
-    font-size: 13px;
+    padding: 9px 12px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--text-main);
     background: var(--bg-color);
@@ -244,8 +244,8 @@ label {
 }
 
 .auth-body .form-input-neo {
-    padding: 12px 16px !important;
-    font-size: 14px !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
 }
 
 body.dark-mode .form-input-neo {
@@ -269,22 +269,22 @@ body.dark-mode .form-input-neo {
 
 .error-text {
     color: var(--danger-color);
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
-    margin-top: 4px;
-    margin-left: 5px;
+    margin-top: 3px;
+    margin-left: 4px;
 }
 
 .auth-body .error-text {
-    font-size: 11px;
-    margin-top: 5px;
-    margin-left: 12px;
+    font-size: 10px;
+    margin-top: 4px;
+    margin-left: 10px;
 }
 
 .btn-submit-glass {
     width: 100%;
-    padding: 11px 20px;
-    font-size: 14px;
+    padding: 9px 18px;
+    font-size: 12px;
     font-weight: 800;
     color: #ffffff !important;
     background: var(--accent-orange) !important;
@@ -294,14 +294,14 @@ body.dark-mode .form-input-neo {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 12px;
+    margin-top: 10px;
     transition: all 0.2s ease;
 }
 
 .auth-body .btn-submit-glass {
-    padding: 12px 22px !important;
-    font-size: 16px !important;
-    margin-top: 16px !important;
+    padding: 10px 20px !important;
+    font-size: 14px !important;
+    margin-top: 14px !important;
 }
 
 .btn-submit-glass:hover {
@@ -310,8 +310,8 @@ body.dark-mode .form-input-neo {
 }
 
 .link {
-    margin-top: 28px !important;
-    font-size: 14px !important;
+    margin-top: 22px !important;
+    font-size: 12px !important;
     font-weight: 600;
     color: var(--text-muted);
     text-align: center;
@@ -341,10 +341,10 @@ body.dark-mode .form-input-neo {
 }
 
 .header-container {
-    max-width: 1280px !important;
-    width: 92% !important;
+    max-width: 1440px !important;
+    width: 82% !important;
     margin: 0 auto !important;
-    padding: 0.7rem 0 !important;
+    padding: 0.5rem 0 !important;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -352,7 +352,7 @@ body.dark-mode .form-input-neo {
 }
 
 .brand {
-    font-size: 1.35rem;
+    font-size: 1.4rem;
     font-weight: 900;
     letter-spacing: -0.5px;
 }
@@ -360,13 +360,13 @@ body.dark-mode .form-input-neo {
 .brand-logo { color: var(--accent-orange); }
 .brand-title { color: var(--text-main); }
 
-.nav-menu { display: flex; gap: 0.6rem; }
+.nav-menu { display: flex; gap: 0.5rem; }
 
 .nav-link {
     text-decoration: none;
     color: var(--text-muted);
     font-weight: 800;
-    font-size: 0.85rem;
+    font-size: 0.92rem;
     padding: 0.45rem 0.85rem;
     border-radius: var(--radius-sm);
     transition: all 0.2s ease;
@@ -375,11 +375,11 @@ body.dark-mode .form-input-neo {
 .nav-link:hover { color: var(--text-main); box-shadow: var(--neo-shadow-in); }
 .nav-link.active { color: var(--accent-orange); box-shadow: var(--neo-shadow-in); }
 
-.header-actions { display: flex; align-items: center; gap: 0.6rem; }
+.header-actions { display: flex; align-items: center; gap: 0.5rem; }
 
 .live-clock {
     font-family: 'Inter', monospace;
-    font-size: 0.75rem;
+    font-size: 0.82rem;
     font-weight: 800;
     color: var(--text-muted);
     padding: 0.4rem 0.8rem;
@@ -392,12 +392,12 @@ body.dark-mode .form-input-neo {
     background: var(--bg-color);
     border: none;
     color: var(--text-main);
-    padding: 0.45rem 0.85rem;
+    padding: 0.42rem 0.85rem;
     border-radius: var(--radius-sm);
     box-shadow: var(--neo-shadow-out);
     cursor: pointer;
     font-weight: 800;
-    font-size: 0.8rem;
+    font-size: 0.88rem;
     transition: all 0.2s ease;
 }
 
@@ -409,13 +409,13 @@ body.dark-mode .form-input-neo {
    ========================================================================== */
 .dashboard-container {
     flex: 1;
-    max-width: 1280px !important;
-    width: 92% !important;
+    max-width: 1440px !important;
+    width: 82% !important;
     margin: 0 auto !important;
-    padding: 0.7rem 0 !important;
+    padding: 0.6rem 0 !important;
     display: flex;
     flex-direction: column;
-    gap: 0.7rem;
+    gap: 0.6rem;
     box-sizing: border-box;
     min-height: 0;
 }
@@ -424,17 +424,17 @@ body.dark-mode .form-input-neo {
     background: var(--bg-color);
     border-radius: var(--radius-lg);
     box-shadow: var(--neo-shadow-out);
-    padding: 0.8rem 1.2rem;
+    padding: 0.6rem 1rem;
     flex-shrink: 0;
 }
 
-.welcome-section h1 { font-size: 1.5rem; font-weight: 800; text-align: left; margin: 0; }
-.welcome-section .subtitle { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-top: 0.2rem; }
+.welcome-section h1 { font-size: 1.35rem; font-weight: 800; text-align: left; margin: 0; }
+.welcome-section .subtitle { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); margin-top: 0.15rem; }
 
 .metrics-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
+    gap: 0.7rem;
     flex-shrink: 0;
 }
 
@@ -442,15 +442,15 @@ body.dark-mode .form-input-neo {
     background: var(--bg-color);
     border-radius: var(--radius-lg);
     box-shadow: var(--neo-shadow-out);
-    padding: 0.8rem 1rem;
+    padding: 0.65rem 0.85rem;
     display: flex;
     align-items: center;
-    gap: 0.8rem;
+    gap: 0.7rem;
 }
 
 .metric-icon {
-    width: 42px;
-    height: 42px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -460,13 +460,13 @@ body.dark-mode .form-input-neo {
     flex-shrink: 0;
 }
 
-.metric-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); font-weight: 800; }
-.metric-value { font-size: 1.35rem; font-weight: 800; margin-top: 0.1rem; color: var(--text-main); }
+.metric-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); font-weight: 800; }
+.metric-value { font-size: 1.2rem; font-weight: 800; margin-top: 0.05rem; color: var(--text-main); }
 
 .dashboard-bottom-grid {
     display: grid;
     grid-template-columns: 1fr 1.6fr;
-    gap: 1rem;
+    gap: 0.7rem;
     flex: 1;
     min-height: 0;
 }
@@ -475,13 +475,13 @@ body.dark-mode .form-input-neo {
     background: var(--bg-color);
     border-radius: var(--radius-lg);
     box-shadow: var(--neo-shadow-out);
-    padding: 1rem 1.3rem;
+    padding: 0.8rem 1rem;
     display: flex;
     flex-direction: column;
     height: 100%;
 }
 
-.pipeline-section h2 { text-align: left; font-size: 1rem; font-weight: 800; margin-bottom: 0.7rem; }
+.pipeline-section h2 { text-align: left; font-size: 0.92rem; font-weight: 800; margin-bottom: 0.6rem; }
 
 .pipeline-infographic {
     display: flex;
@@ -521,7 +521,7 @@ body.dark-mode .form-input-neo {
     background: var(--bg-color);
     border-radius: var(--radius-lg);
     box-shadow: var(--neo-shadow-out);
-    padding: 1rem 1.3rem;
+    padding: 0.8rem 1rem;
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -532,11 +532,11 @@ body.dark-mode .form-input-neo {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.6rem;
 }
 
-.section-header h2 { text-align: left; font-size: 1.1rem; font-weight: 800; margin: 0; }
-.link-view-all { color: var(--accent-orange); text-decoration: none; font-weight: 800; font-size: 0.85rem; }
+.section-header h2 { text-align: left; font-size: 1rem; font-weight: 800; margin: 0; }
+.link-view-all { color: var(--accent-orange); text-decoration: none; font-weight: 800; font-size: 0.82rem; }
 
 .table-responsive { flex: 1; overflow-y: auto; }
 .data-table { width: 100%; border-collapse: collapse; text-align: left; }
@@ -589,17 +589,17 @@ body.dark-mode .form-input-neo {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.2rem;
+    margin-bottom: 1rem;
 }
 
-.page-header-bar h1 { font-size: 1.5rem; font-weight: 800; }
+.page-header-bar h1 { font-size: 1.35rem; font-weight: 800; }
 
 .btn-add-client {
     width: auto !important;
-    padding: 0.4rem 0.85rem !important;
-    font-size: 0.8rem !important;
+    padding: 0.35rem 0.75rem !important;
+    font-size: 0.78rem !important;
     margin: 0 !important;
-    height: 32px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -612,21 +612,21 @@ body.dark-mode .form-input-neo {
     background: var(--bg-color);
     box-shadow: var(--neo-shadow-out);
     border-radius: var(--radius-lg);
-    padding: 0.8rem 1.1rem;
-    margin-bottom: 1.5rem;
+    padding: 0.6rem 0.9rem;
+    margin-bottom: 1.2rem;
     display: flex;
-    gap: 1rem;
+    gap: 0.8rem;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
 }
 
-.search-box-wrapper { flex: 1; min-width: 220px; }
+.search-box-wrapper { flex: 1; min-width: 180px; }
 
-.filter-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.filter-chips { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 .filter-chips .chip {
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
+    padding: 0.38rem 0.8rem;
+    font-size: 0.78rem;
     font-weight: 800;
     border: none;
     background: var(--bg-color);
@@ -639,58 +639,58 @@ body.dark-mode .form-input-neo {
 
 .filter-chips .chip.active { color: var(--accent-orange); box-shadow: var(--neo-shadow-in); }
 
-.sort-select { appearance: none; cursor: pointer; min-width: 160px; }
+.sort-select { appearance: none; cursor: pointer; min-width: 140px; }
 
 .clients-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-    gap: 1.2rem;
-    padding-bottom: 2rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.9rem;
+    padding-bottom: 1.5rem;
 }
 
 .client-card {
     background: var(--bg-color);
     box-shadow: var(--neo-shadow-out);
     border-radius: var(--radius-lg);
-    padding: 0.85rem;
+    padding: 0.7rem;
     display: flex;
     flex-direction: column;
-    gap: 0.7rem;
+    gap: 0.5rem;
     cursor: pointer;
     transition: all 0.25s ease;
     overflow: hidden;
 }
 
-.client-card:hover { transform: translateY(-3px); box-shadow: var(--neo-shadow-card-hover); }
+.client-card:hover { transform: translateY(-2px); box-shadow: var(--neo-shadow-card-hover); }
 
-.client-card-header { display: flex; align-items: center; gap: 0.7rem; }
-.client-avatar { width: 42px; height: 42px; border-radius: 50%; box-shadow: var(--neo-shadow-out); object-fit: cover; flex-shrink: 0; }
+.client-card-header { display: flex; align-items: center; gap: 0.5rem; }
+.client-avatar { width: 36px; height: 36px; border-radius: 50%; box-shadow: var(--neo-shadow-out); object-fit: cover; flex-shrink: 0; }
 .client-title-info { overflow: hidden; }
-.client-title-info h3 { font-size: 0.95rem; font-weight: 800; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.client-company-name { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+.client-title-info h3 { font-size: 1rem; font-weight: 800; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.client-company-name { font-size: 0.82rem; font-weight: 700; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
 
 .client-card-body {
     background: var(--bg-color);
-    padding: 0.7rem;
+    padding: 0.5rem;
     border-radius: var(--radius-md);
     box-shadow: var(--neo-shadow-in);
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.3rem;
 }
 
 .card-info-row {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    font-size: 0.8rem;
-    gap: 0.1rem;
+    font-size: 0.85rem;
+    gap: 0.08rem;
 }
 
 .card-info-row span {
     color: var(--text-muted);
     font-weight: 700;
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     flex-shrink: 0;
@@ -700,20 +700,20 @@ body.dark-mode .form-input-neo {
     color: var(--text-main);
     font-weight: 700;
     text-align: left;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     white-space: normal;
     word-break: normal;
     overflow-wrap: break-word;
     width: 100%;
 }
 
-.deal-value-text { color: var(--accent-orange) !important; font-weight: 800 !important; font-size: 0.88rem !important; }
+.deal-value-text { color: var(--accent-orange) !important; font-weight: 800 !important; font-size: 0.92rem !important; }
 
 .client-card-footer { display: flex; justify-content: space-between; align-items: center; gap: 0.3rem; margin-top: auto; }
 
 .select-status-inline {
     padding: 0.25rem 0.45rem;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     font-weight: 800;
     border: none;
     border-radius: var(--radius-sm);
