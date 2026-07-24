@@ -11,45 +11,45 @@
 
     /* Base font scaling */
     html, body {
-        font-size: 17px;
+        font-size: 12px;
     }
 
     /* Header: stack nav under brand */
     .header-container {
         flex-wrap: wrap;
-        gap: 0.8rem;
-        padding: 1rem 0 !important;
+        gap: 0.5rem;
+        padding: 0.7rem 0 !important;
     }
 
     .brand {
-        font-size: 1.8rem;
+        font-size: 1.3rem;
     }
 
     .nav-menu {
         order: 3;
         width: 100%;
         justify-content: center;
-        gap: 0.6rem;
+        gap: 0.4rem;
     }
 
     .nav-link {
-        font-size: 1.05rem;
-        padding: 0.7rem 1.2rem;
+        font-size: 0.85rem;
+        padding: 0.5rem 0.8rem;
     }
 
     .header-actions {
-        gap: 0.8rem;
+        gap: 0.5rem;
     }
 
     /* Dashboard */
     .metrics-grid {
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 1.2rem !important;
+        gap: 0.8rem !important;
     }
 
     .dashboard-bottom-grid {
         grid-template-columns: 1fr !important;
-        gap: 1.5rem !important;
+        gap: 1rem !important;
     }
 
     .dashboard-body {
@@ -58,13 +58,13 @@
     }
 
     .welcome-section h1 {
-        font-size: 2rem;
+        font-size: 1.4rem;
     }
 
     /* Clients page header */
     .page-header-bar {
         flex-wrap: wrap;
-        gap: 1rem;
+        gap: 0.7rem;
     }
 
     .view-toggle-wrapper {
@@ -73,11 +73,11 @@
 
     /* Kanban horizontal scroll on tablet */
     .kanban-board {
-        min-height: 400px;
+        min-height: 280px;
     }
 
     .kanban-column {
-        min-width: 240px;
+        min-width: 180px;
     }
 
     /* Profile grid */
@@ -87,37 +87,37 @@
 
     /* Client grid */
     .clients-grid {
-        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     }
 
     /* Auth pages */
     .auth-body .card {
-        padding: 50px 40px !important;
-        max-width: 600px !important;
+        padding: 32px 28px !important;
+        max-width: 420px !important;
     }
 
     .auth-body h2 {
-        font-size: 32px !important;
+        font-size: 24px !important;
     }
 
     .auth-body label {
-        font-size: 22px !important;
-        margin: 16px 0 10px 16px !important;
+        font-size: 15px !important;
+        margin: 10px 0 6px 10px !important;
     }
 
     .auth-body .form-input-neo {
-        padding: 18px 22px !important;
-        font-size: 18px !important;
+        padding: 12px 14px !important;
+        font-size: 13px !important;
     }
 
     .auth-body .btn-submit-glass {
-        padding: 18px 30px !important;
-        font-size: 22px !important;
+        padding: 12px 20px !important;
+        font-size: 15px !important;
     }
 
     .link {
-        font-size: 20px !important;
-        margin-top: 36px !important;
+        font-size: 14px !important;
+        margin-top: 24px !important;
     }
 }
 
@@ -127,52 +127,52 @@
 @media (max-width: 768px) {
 
     html, body {
-        font-size: 15px;
+        font-size: 11.5px;
     }
 
     /* Header fully stacked */
     .header-container {
         flex-direction: column !important;
-        gap: 0.8rem !important;
-        padding: 0.8rem 0 !important;
+        gap: 0.5rem !important;
+        padding: 0.5rem 0 !important;
     }
 
     .nav-menu {
         width: 100% !important;
         justify-content: center !important;
-        gap: 0.4rem !important;
+        gap: 0.3rem !important;
     }
 
     .nav-link {
-        font-size: 0.95rem;
-        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
+        padding: 0.4rem 0.7rem;
     }
 
     .header-actions {
         width: 100% !important;
         justify-content: center !important;
-        gap: 0.8rem !important;
+        gap: 0.5rem !important;
     }
 
     .live-clock {
-        font-size: 0.9rem;
-        padding: 0.5rem 1rem;
+        font-size: 0.7rem;
+        padding: 0.35rem 0.7rem;
     }
 
     .btn-theme, .btn-logout {
-        padding: 0.6rem 1.2rem;
-        font-size: 0.95rem;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
     }
 
     /* Page titles */
     .page-header-bar {
         flex-direction: column !important;
         align-items: stretch !important;
-        gap: 1rem !important;
+        gap: 0.7rem !important;
     }
 
     .page-header-bar h1 {
-        font-size: 1.8rem !important;
+        font-size: 1.3rem !important;
         text-align: center !important;
     }
 
@@ -197,15 +197,15 @@
     /* Shortcuts legend */
     .shortcuts-legend {
         text-align: center !important;
-        font-size: 0.95rem !important;
+        font-size: 0.75rem !important;
     }
 
     /* Toolbar */
     .toolbar {
         flex-direction: column !important;
         align-items: stretch !important;
-        padding: 1.2rem !important;
-        gap: 1rem !important;
+        padding: 0.8rem !important;
+        gap: 0.7rem !important;
     }
 
     .search-box-wrapper {
@@ -225,51 +225,51 @@
     /* Clients grid → single column */
     .clients-grid {
         grid-template-columns: 1fr !important;
-        gap: 1.5rem;
+        gap: 1rem;
     }
 
     /* Kanban board scrollable */
     .kanban-board {
-        gap: 1rem;
-        padding: 8px;
-        min-height: 350px;
+        gap: 0.7rem;
+        padding: 6px;
+        min-height: 250px;
     }
 
     .kanban-column {
-        min-width: 220px;
-        padding: 1rem;
+        min-width: 160px;
+        padding: 0.7rem;
     }
 
     .column-header {
-        font-size: 1.15rem;
+        font-size: 0.85rem;
     }
 
     /* Dashboard */
     .dashboard-container {
-        padding: 1rem 0 !important;
-        gap: 1rem !important;
+        padding: 0.7rem 0 !important;
+        gap: 0.7rem !important;
     }
 
     .welcome-section {
-        padding: 1.2rem !important;
+        padding: 0.8rem !important;
     }
 
     .welcome-section h1 {
-        font-size: 1.7rem !important;
+        font-size: 1.2rem !important;
         text-align: center !important;
     }
 
     .pipeline-section, .recent-clients-section {
-        padding: 1.2rem !important;
+        padding: 0.8rem !important;
     }
 
     .pipeline-section h2, .section-header h2 {
-        font-size: 1.3rem !important;
+        font-size: 0.95rem !important;
     }
 
     /* Modals — full width on mobile */
     .card.modal-card {
-        padding: 2rem !important;
+        padding: 1.3rem !important;
         width: 95% !important;
         max-height: 90vh;
         overflow-y: auto;
@@ -280,24 +280,24 @@
     }
 
     .modal-header h2 {
-        font-size: 1.6rem !important;
+        font-size: 1.15rem !important;
     }
 
     /* Details modal — stack profile banner */
     .details-profile-banner {
         flex-direction: column;
         text-align: center;
-        gap: 1rem;
-        padding: 1.2rem !important;
+        gap: 0.7rem;
+        padding: 0.8rem !important;
     }
 
     .details-avatar {
-        width: 70px;
-        height: 70px;
+        width: 48px;
+        height: 48px;
     }
 
     .details-name {
-        font-size: 1.4rem;
+        font-size: 1rem;
     }
 
     /* Call controls wrap */
@@ -308,7 +308,7 @@
     .call-duration {
         width: 100% !important;
         text-align: center !important;
-        margin-top: 0.5rem !important;
+        margin-top: 0.3rem !important;
         margin-left: 0 !important;
     }
 
@@ -326,29 +326,29 @@
     }
 
     .btn-reminder {
-        font-size: 16px !important;
-        padding: 16px 24px !important;
+        font-size: 12px !important;
+        padding: 10px 16px !important;
     }
 
     /* Profile page */
     .profile-layout-grid {
         grid-template-columns: 1fr !important;
-        gap: 1.5rem !important;
+        gap: 1rem !important;
     }
 
     .profile-card {
-        padding: 2rem !important;
+        padding: 1.3rem !important;
     }
 
     .profile-header-info {
         flex-direction: column;
         text-align: center;
-        gap: 1rem;
+        gap: 0.7rem;
     }
 
     .profile-user-details h2 {
         text-align: center !important;
-        font-size: 1.8rem !important;
+        font-size: 1.3rem !important;
     }
 
     .user-email-text, .profile-meta {
@@ -356,79 +356,79 @@
     }
 
     .profile-card h3 {
-        font-size: 1.35rem;
+        font-size: 1rem;
         text-align: center;
     }
 
     /* Auth pages — tighter on tablet */
     .auth-body .card {
-        padding: 36px 28px !important;
+        padding: 24px 20px !important;
         max-width: 100% !important;
     }
 
     .auth-body h2 {
-        font-size: 28px !important;
-    }
-
-    .auth-body label {
-        font-size: 18px !important;
-        margin: 14px 0 8px 12px !important;
-    }
-
-    .auth-body .form-input-neo {
-        padding: 16px 18px !important;
-        font-size: 16px !important;
-    }
-
-    .auth-body .btn-submit-glass {
-        padding: 16px 26px !important;
         font-size: 20px !important;
     }
 
+    .auth-body label {
+        font-size: 13px !important;
+        margin: 10px 0 5px 8px !important;
+    }
+
+    .auth-body .form-input-neo {
+        padding: 10px 12px !important;
+        font-size: 12px !important;
+    }
+
+    .auth-body .btn-submit-glass {
+        padding: 10px 18px !important;
+        font-size: 14px !important;
+    }
+
     .auth-body .error-text {
-        font-size: 15px;
-        margin-left: 12px;
+        font-size: 11px;
+        margin-left: 8px;
     }
 
     .link {
-        font-size: 17px !important;
-        margin-top: 28px !important;
+        font-size: 12px !important;
+        margin-top: 18px !important;
     }
 
     .card-subtitle {
-        font-size: 16px;
+        font-size: 12px;
     }
 
     .auth-body .card-subtitle {
-        font-size: 16px;
-        margin-bottom: 24px;
+        font-size: 12px;
+        margin-bottom: 16px;
     }
 
     /* Fixed theme button on auth pages — smaller */
     .fixed-theme-wrapper {
-        top: 16px;
-        right: 16px;
+        top: 12px;
+        right: 12px;
     }
 
     .btn-theme-fixed {
-        width: 48px;
-        height: 48px;
-        font-size: 22px;
+        width: 34px;
+        height: 34px;
+        font-size: 16px;
     }
 
     /* Data table responsiveness */
     .data-table th {
-        font-size: 0.95rem;
-        padding: 0.8rem 0.6rem;
+        font-size: 0.7rem;
+        padding: 0.5rem 0.4rem;
     }
 
     .data-table td {
-        padding: 0.9rem 0.6rem;
-        font-size: 1.05rem;
+        padding: 0.6rem 0.4rem;
+        font-size: 0.8rem;
     }
 
     .data-table td strong {
-        font-size: 1.1rem;
+        font-size: 0.8rem;
     }
 }
 
@@ -438,27 +438,27 @@
 @media (max-width: 576px) {
 
     html, body {
-        font-size: 14px;
+        font-size: 11px;
     }
 
     /* Container tighter padding */
     .container {
         width: 100% !important;
-        padding: 0 12px !important;
+        padding: 0 8px !important;
     }
 
     .dashboard-container {
         width: 100% !important;
-        padding: 0.8rem 12px !important;
+        padding: 0.5rem 8px !important;
     }
 
     .header-container {
         width: 100% !important;
-        padding: 0.6rem 12px !important;
+        padding: 0.4rem 8px !important;
     }
 
     .main-content {
-        padding: 1.5rem 0;
+        padding: 1rem 0;
     }
 
     /* Dashboard metrics single column */
@@ -467,101 +467,101 @@
     }
 
     .metric-card {
-        padding: 1rem !important;
-        gap: 1rem !important;
+        padding: 0.7rem !important;
+        gap: 0.7rem !important;
     }
 
     .metric-icon {
-        width: 48px !important;
-        height: 48px !important;
+        width: 34px !important;
+        height: 34px !important;
     }
 
     .metric-icon svg {
-        width: 18px !important;
-        height: 18px !important;
+        width: 14px !important;
+        height: 14px !important;
     }
 
     .metric-value {
-        font-size: 1.5rem !important;
+        font-size: 1.1rem !important;
     }
 
     .metric-label {
-        font-size: 0.75rem !important;
+        font-size: 0.55rem !important;
     }
 
     .welcome-section h1 {
-        font-size: 1.4rem !important;
+        font-size: 1rem !important;
     }
 
     /* Section headers */
     .section-header {
         flex-direction: column !important;
         align-items: flex-start !important;
-        gap: 0.6rem !important;
+        gap: 0.4rem !important;
     }
 
     .section-header h2 {
-        font-size: 1.2rem !important;
+        font-size: 0.9rem !important;
     }
 
     .link-view-all {
-        font-size: 1rem;
+        font-size: 0.75rem;
     }
 
     /* Data table — smaller text */
     .data-table th, .data-table td {
-        padding: 0.7rem 0.4rem !important;
-        font-size: 0.9rem !important;
+        padding: 0.45rem 0.3rem !important;
+        font-size: 0.7rem !important;
     }
 
     .data-table td strong {
-        font-size: 1rem !important;
+        font-size: 0.75rem !important;
     }
 
     .status-badge {
-        padding: 0.35rem 0.7rem !important;
-        font-size: 0.85rem !important;
+        padding: 0.2rem 0.5rem !important;
+        font-size: 0.65rem !important;
     }
 
     /* Pipeline chart */
     .pipeline-chart-wrapper canvas {
-        max-width: 200px !important;
+        max-width: 140px !important;
     }
 
     .info-name {
-        font-size: 1rem;
+        font-size: 0.75rem;
     }
 
     .info-val {
-        font-size: 1.05rem;
+        font-size: 0.8rem;
     }
 
     /* Client cards — tighter */
     .client-card {
-        padding: 1rem !important;
+        padding: 0.7rem !important;
     }
 
     .client-avatar {
-        width: 55px !important;
-        height: 55px !important;
+        width: 38px !important;
+        height: 38px !important;
     }
 
     .client-title-info h3 {
-        font-size: 1.2rem;
-    }
-
-    .client-company-name {
         font-size: 0.9rem;
     }
 
+    .client-company-name {
+        font-size: 0.7rem;
+    }
+
     .deal-value-text {
-        font-size: 1.15rem !important;
+        font-size: 0.85rem !important;
     }
 
     /* Client card footer — stack on small mobile */
     .client-card-footer {
         flex-wrap: wrap !important;
-        gap: 0.6rem !important;
+        gap: 0.4rem !important;
     }
 
     .select-status-inline, .btn-edit-client, .btn-delete-client {
@@ -572,177 +572,177 @@
 
     /* Kanban */
     .kanban-board {
-        min-height: 300px;
-        gap: 0.8rem;
+        min-height: 220px;
+        gap: 0.5rem;
     }
 
     .kanban-column {
-        min-width: 200px;
-        padding: 0.8rem;
+        min-width: 150px;
+        padding: 0.5rem;
     }
 
     .kanban-card {
-        padding: 0.8rem;
+        padding: 0.5rem;
     }
 
     .kanban-card-title {
-        font-size: 1.05rem;
+        font-size: 0.8rem;
     }
 
     .column-header {
-        font-size: 1rem;
+        font-size: 0.75rem;
     }
 
     /* Modals — nearly full screen */
     .card.modal-card {
-        padding: 1.5rem !important;
+        padding: 1rem !important;
         width: 96% !important;
-        margin: 8px !important;
+        margin: 6px !important;
         border-radius: var(--radius-md) !important;
     }
 
     .modal-header h2 {
-        font-size: 1.3rem !important;
+        font-size: 1rem !important;
     }
 
     .btn-close-modal {
-        width: 36px;
-        height: 36px;
-        font-size: 1rem;
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
     }
 
     /* Details modal */
     .details-avatar {
-        width: 60px;
-        height: 60px;
+        width: 42px;
+        height: 42px;
     }
 
     .details-name {
-        font-size: 1.2rem;
+        font-size: 0.9rem;
     }
 
     .details-company {
-        font-size: 0.95rem;
+        font-size: 0.7rem;
     }
 
     .info-item {
-        padding: 0.9rem 1.2rem;
+        padding: 0.6rem 0.8rem;
     }
 
     .info-label {
-        font-size: 0.85rem;
+        font-size: 0.65rem;
     }
 
     .info-value {
-        font-size: 1rem;
+        font-size: 0.75rem;
     }
 
     /* Notes */
     .notes-list-box {
-        max-height: 200px;
-        padding: 0.8rem 1rem;
+        max-height: 140px;
+        padding: 0.5rem 0.7rem;
     }
 
     .note-input {
-        padding: 14px 18px !important;
-        font-size: 16px !important;
+        padding: 10px 12px !important;
+        font-size: 12px !important;
     }
 
     .btn-add-note {
-        padding: 14px 20px !important;
-        font-size: 16px !important;
+        padding: 10px 14px !important;
+        font-size: 12px !important;
     }
 
     .btn-reminder {
-        padding: 14px 20px !important;
-        font-size: 14px !important;
+        padding: 10px 14px !important;
+        font-size: 11px !important;
     }
 
     /* Profile page */
     .avatar-circle {
-        width: 80px;
-        height: 80px;
-        font-size: 2.2rem;
+        width: 56px;
+        height: 56px;
+        font-size: 1.6rem;
     }
 
     .profile-user-details h2 {
-        font-size: 1.5rem !important;
+        font-size: 1.1rem !important;
     }
 
     .profile-card {
-        padding: 1.5rem !important;
+        padding: 1rem !important;
     }
 
     .profile-card h3 {
-        font-size: 1.2rem;
+        font-size: 0.9rem;
     }
 
     /* Auth pages — compact mobile */
     .auth-body {
-        padding: 16px;
+        padding: 12px;
         align-items: flex-start;
-        padding-top: 60px;
+        padding-top: 42px;
     }
 
     .auth-body .card {
-        padding: 28px 20px !important;
+        padding: 20px 14px !important;
         border-radius: var(--radius-md) !important;
     }
 
     .auth-body h2 {
-        font-size: 24px !important;
+        font-size: 18px !important;
     }
 
     .auth-body label {
-        font-size: 16px !important;
-        margin: 12px 0 6px 8px !important;
+        font-size: 12px !important;
+        margin: 8px 0 4px 6px !important;
     }
 
     .auth-body .form-input-neo {
-        padding: 14px 16px !important;
-        font-size: 15px !important;
+        padding: 9px 11px !important;
+        font-size: 11px !important;
     }
 
     .auth-body .btn-submit-glass {
-        padding: 14px 20px !important;
-        font-size: 17px !important;
-        margin-top: 16px !important;
+        padding: 9px 14px !important;
+        font-size: 12px !important;
+        margin-top: 10px !important;
     }
 
     .auth-body .card-subtitle {
-        font-size: 14px;
-        margin-bottom: 20px;
+        font-size: 11px;
+        margin-bottom: 14px;
     }
 
     .link {
-        font-size: 14px !important;
-        margin-top: 20px !important;
+        font-size: 10px !important;
+        margin-top: 14px !important;
     }
 
     .auth-body .error-text {
-        font-size: 13px;
-        margin-left: 8px;
+        font-size: 10px;
+        margin-left: 6px;
     }
 
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 14px;
     }
 
     /* Password strength */
     .password-strength-container {
-        margin-top: 8px;
+        margin-top: 5px;
     }
 
     /* Fixed theme button — smaller mobile */
     .fixed-theme-wrapper {
-        top: 12px;
-        right: 12px;
+        top: 8px;
+        right: 8px;
     }
 
     .btn-theme-fixed {
-        width: 42px;
-        height: 42px;
-        font-size: 18px;
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
     }
 
     /* Call controls stack */
@@ -753,30 +753,30 @@
     }
 
     .call-timer-title {
-        font-size: 1.05rem;
+        font-size: 0.8rem;
     }
 
     /* Toolbar chips smaller */
     .filter-chips .chip {
-        padding: 0.6rem 1.1rem;
-        font-size: 0.95rem;
+        padding: 0.4rem 0.7rem;
+        font-size: 0.7rem;
     }
 
     /* Shortcuts legend hide on very small screens */
     .shortcuts-legend {
-        font-size: 0.8rem !important;
+        font-size: 0.6rem !important;
         line-height: 1.8;
     }
 
     /* Form inputs global */
     .form-input-neo {
-        padding: 14px 16px;
-        font-size: 16px;
+        padding: 10px 12px;
+        font-size: 12px;
     }
 
     .btn-submit-glass {
-        padding: 14px 24px;
-        font-size: 17px;
+        padding: 10px 16px;
+        font-size: 12px;
     }
 }
 
@@ -786,62 +786,62 @@
 @media (max-width: 400px) {
 
     html, body {
-        font-size: 13px;
+        font-size: 10.5px;
     }
 
     .brand {
-        font-size: 1.4rem;
+        font-size: 1.1rem;
     }
 
     .nav-link {
-        font-size: 0.85rem;
-        padding: 0.5rem 0.7rem;
+        font-size: 0.7rem;
+        padding: 0.35rem 0.5rem;
     }
 
     .page-header-bar h1 {
-        font-size: 1.5rem !important;
+        font-size: 1.1rem !important;
     }
 
     /* Auth even more compact */
     .auth-body .card {
-        padding: 24px 16px !important;
+        padding: 16px 12px !important;
     }
 
     .auth-body h2 {
-        font-size: 22px !important;
+        font-size: 16px !important;
     }
 
     /* Kanban single-column scroll */
     .kanban-column {
-        min-width: 180px;
+        min-width: 130px;
     }
 
     .kanban-card-title {
-        font-size: 0.95rem;
+        font-size: 0.7rem;
     }
 
     .kanban-card-value {
-        font-size: 0.9rem;
+        font-size: 0.65rem;
     }
 
     /* Toast */
     .toast {
-        font-size: 0.9rem;
-        padding: 0.7rem 1.4rem;
+        font-size: 0.7rem;
+        padding: 0.5rem 1rem;
         width: 90%;
         text-align: center;
     }
 
     /* Shortcuts legend - hide keyboard label, only show keys */
     .shortcuts-legend {
-        font-size: 0.75rem !important;
+        font-size: 0.55rem !important;
     }
 
     /* Profile avatar smaller */
     .avatar-circle {
-        width: 65px;
-        height: 65px;
-        font-size: 1.8rem;
+        width: 46px;
+        height: 46px;
+        font-size: 1.3rem;
     }
 }
 
@@ -855,19 +855,19 @@
     }
 
     .dashboard-container {
-        gap: 0.8rem !important;
+        gap: 0.5rem !important;
     }
 
     .welcome-section {
-        padding: 0.8rem 1.2rem !important;
+        padding: 0.5rem 0.8rem !important;
     }
 
     .welcome-section h1 {
-        font-size: 1.4rem !important;
+        font-size: 1rem !important;
     }
 
     .metric-card {
-        padding: 0.8rem 1rem !important;
+        padding: 0.5rem 0.7rem !important;
     }
 }
 

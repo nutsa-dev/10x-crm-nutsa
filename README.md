@@ -33,14 +33,16 @@
 
 ## Live Demo
 
-- **URL:** [Live Deployment Link](https://your-vercel-or-netlify-deployment-link.app) *(Update this placeholder with your Vercel or Netlify link once deployed)*
+- **URL:** [10x-crm-nutsa.vercel.app](https://10x-crm-nutsa.vercel.app)
 
 ## Test Account
 
 To log in immediately without completing the registration form, you can use the pre-configured demo account:
+
 - **Email:** `demo@test.com`
 - **Password:** `Password123`
 
 ## Credits
 
-Special thanks to my 10X JavaScript mentor for architectural guidance, and to the community resources (MDN Web Docs) for documentation benchmarks.
+Special thanks to my 10X JavaScript mentors, lecturers and classmates for architectural guidance and support.
+Aespecially big thanks to those who where ready toa answer e. g. from the work, from Turkey, from public transport, etc. You know who you are.
