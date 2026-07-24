@@ -296,12 +296,14 @@ function renderClients(clients) {
     });
 }
 
-function updateClientStatus(id, newStatus) {
+function updateClientStatus(id, newStatus, showNotification = true) {
     if (typeof playASMRPop === 'function') playASMRPop();
     clientsState = clientsState.map(client => client.id === id ? { ...client, status: newStatus } : client);
     Storage.set(STORAGE_KEYS.CLIENTS, clientsState);
     applyFiltersAndRender();
-    showToast(`Status updated to ${newStatus} ✓`, true);
+    if (showNotification) {
+        showToast(`Status updated to ${newStatus} ✓`, true);
+    }
 }
 
 // ==========================================================================
@@ -757,7 +759,7 @@ function handleDrop(event, newStatus) {
     
     const id = parseInt(event.dataTransfer.getData('text/plain'), 10);
     if (!isNaN(id)) {
-        updateClientStatus(id, newStatus);
+        updateClientStatus(id, newStatus, false);
     }
 }
 
@@ -771,6 +773,7 @@ function renderKanban(clients) {
         if (countEl) countEl.textContent = '0';
     });
     
+    let globalCardIndex = 0;
     statuses.forEach(status => {
         const listEl = document.getElementById(`cards-${status}`);
         const countEl = document.getElementById(`count-${status}`);
@@ -787,13 +790,14 @@ function renderKanban(clients) {
         matchingClients.forEach(client => {
             const dealFormatted = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(client.dealValue || 0);
             const cardHTML = `
-                <div class="kanban-card" draggable="true" ondragstart="handleDragStart(event, ${client.id})" onclick="openDetailsModal(${client.id})">
+                <div class="kanban-card" style="animation-delay: ${globalCardIndex * 0.05}s;" draggable="true" ondragstart="handleDragStart(event, ${client.id})" onclick="openDetailsModal(${client.id})">
                     <div class="kanban-card-title">${escapeHTML(client.name)}</div>
                     <div class="kanban-card-company">${escapeHTML(client.company)}</div>
                     <div class="kanban-card-value">${dealFormatted}</div>
                 </div>
             `;
             listEl.insertAdjacentHTML('beforeend', cardHTML);
+            globalCardIndex++;
         });
     });
 }
