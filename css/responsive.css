@@ -52,9 +52,15 @@
         gap: 1rem !important;
     }
 
-    .dashboard-body {
+    .dashboard-body, body.dashboard-body {
         height: auto !important;
-        overflow: auto !important;
+        min-height: 100vh !important;
+        overflow: visible !important;
+        overflow-y: auto !important;
+    }
+
+    .recent-clients-section {
+        overflow-x: auto !important;
     }
 
     .welcome-section h1 {
