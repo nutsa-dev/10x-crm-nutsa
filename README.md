@@ -44,5 +44,7 @@ To log in immediately without completing the registration form, you can use the 
 
 ## Credits
 
-Special thanks to my 10X JavaScript mentors, lecturers and classmates for architectural guidance and support.
-Aespecially big thanks to those who where ready toa answer e. g. from the work, from Turkey, from public transport, etc. You know who you are.
+Special thanks to my 10X mentors, lecturers and classmates for their guidance and support.
+Especially big thanks to those who were ready to answer anytime and from anywhere — whether from work, Turkey, public transport or anywhere else. 
+You know who you are! 
+Cheers!

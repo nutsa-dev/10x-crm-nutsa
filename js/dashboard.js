@@ -110,20 +110,20 @@ function drawPipelineChart(stageCounts) {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    
+
     // Cancel previous animation if it is already running
     if (window.pipelineChartAnimationId) {
         cancelAnimationFrame(window.pipelineChartAnimationId);
     }
-    
+
     const startTime = performance.now();
     const duration = 1200; // 1.2 seconds animation
-    
+
     // Easing function: easeOutCubic
     function easeOutCubic(x) {
         return 1 - Math.pow(1 - x, 3);
     }
-    
+
     function hexToRgb(hex) {
         const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
         hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
@@ -134,7 +134,7 @@ function drawPipelineChart(stageCounts) {
             b: parseInt(result[3], 16)
         } : { r: 255, g: 85, b: 0 };
     }
-    
+
     function interpolateColor(color1, color2, factor) {
         const c1 = hexToRgb(color1);
         const c2 = hexToRgb(color2);
@@ -143,55 +143,55 @@ function drawPipelineChart(stageCounts) {
         const b = Math.round(c1.b + (c2.b - c1.b) * factor);
         return `rgb(${r}, ${g}, ${b})`;
     }
-    
+
     function animate(currentTime) {
         const elapsedTime = currentTime - startTime;
         let p = Math.min(elapsedTime / duration, 1);
         const easedP = easeOutCubic(p);
-        
+
         renderFrame(easedP);
-        
+
         if (p < 1) {
             window.pipelineChartAnimationId = requestAnimationFrame(animate);
         }
     }
-    
+
     function renderFrame(p) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
+
         const total = Object.values(stageCounts).reduce((sum, c) => sum + c, 0);
-        
+
         const centerX = canvas.width / 2;
         const centerY = canvas.height / 2;
         const radius = Math.min(centerX, centerY) - 20;
         const innerRadius = radius * 0.65;
-        
+
         if (total === 0) {
             ctx.beginPath();
             ctx.arc(centerX, centerY, (radius + innerRadius) / 2, 0, 2 * Math.PI);
             ctx.strokeStyle = '#e2e8f0';
             ctx.lineWidth = radius - innerRadius;
             ctx.stroke();
-            
+
             ctx.font = 'bold 24px Inter, sans-serif';
             ctx.fillStyle = document.body.classList.contains('dark-mode') ? '#f1f3f7' : '#2d3436';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText('0', centerX, centerY - 10);
-            
+
             ctx.font = '600 12px Inter, sans-serif';
             ctx.fillStyle = '#828a99';
             ctx.fillText('Total Clients', centerX, centerY + 15);
             return;
         }
-        
+
         // Calculate animated stage counts (Lead/Orange is the base that other stages grow from)
         const animLead = (stageCounts.Lead || 0) * p + total * (1 - p);
         const animContacted = (stageCounts.Contacted || 0) * p;
         const animProposal = (stageCounts.Proposal || 0) * p;
         const animWon = (stageCounts.Won || 0) * p;
         const animLost = (stageCounts.Lost || 0) * p;
-        
+
         const stages = [
             { label: 'Lead', count: animLead, targetColor: '#ff5500' },
             { label: 'Contacted', count: animContacted, targetColor: '#f59e0b' },
@@ -199,56 +199,56 @@ function drawPipelineChart(stageCounts) {
             { label: 'Won', count: animWon, targetColor: '#10b981' },
             { label: 'Lost', count: animLost, targetColor: '#ef4444' }
         ];
-        
+
         const initialColor = '#ff5500'; // start with all orange
-        
+
         // Start angle spins clockwise into place: starts 360 degrees behind and catches up
         let startAngle = -0.5 * Math.PI - (1 - p) * Math.PI * 2;
-        
+
         stages.forEach(stage => {
             if (stage.count === 0) return;
-            
+
             const sliceAngle = (stage.count / total) * 2 * Math.PI;
             const currentColor = interpolateColor(initialColor, stage.targetColor, p);
-            
+
             ctx.beginPath();
             ctx.arc(centerX, centerY, (radius + innerRadius) / 2, startAngle, startAngle + sliceAngle);
             ctx.strokeStyle = currentColor;
             ctx.lineWidth = radius - innerRadius;
             ctx.stroke();
-            
+
             // Draw segment separators
             const isDark = document.body.classList.contains('dark-mode');
             const borderColor = isDark ? '#1e293b' : '#f1f5f9';
-            
+
             ctx.beginPath();
             ctx.moveTo(centerX + innerRadius * Math.cos(startAngle), centerY + innerRadius * Math.sin(startAngle));
             ctx.lineTo(centerX + radius * Math.cos(startAngle), centerY + radius * Math.sin(startAngle));
             ctx.strokeStyle = borderColor;
             ctx.lineWidth = 4;
             ctx.stroke();
-            
+
             ctx.beginPath();
             ctx.moveTo(centerX + innerRadius * Math.cos(startAngle + sliceAngle), centerY + innerRadius * Math.sin(startAngle + sliceAngle));
             ctx.lineTo(centerX + radius * Math.cos(startAngle + sliceAngle), centerY + radius * Math.sin(startAngle + sliceAngle));
             ctx.strokeStyle = borderColor;
             ctx.lineWidth = 4;
             ctx.stroke();
-            
+
             startAngle += sliceAngle;
         });
-        
+
         ctx.font = 'bold 24px Inter, sans-serif';
         ctx.fillStyle = document.body.classList.contains('dark-mode') ? '#f1f3f7' : '#2d3436';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(total, centerX, centerY - 10);
-        
+
         ctx.font = '600 12px Inter, sans-serif';
         ctx.fillStyle = '#828a99';
         ctx.fillText('Total Clients', centerX, centerY + 15);
     }
-    
+
     // Trigger animation
     window.pipelineChartAnimationId = requestAnimationFrame(animate);
 }
@@ -274,7 +274,7 @@ function renderRecentClientsTable(clients) {
         .slice(0, 5);
 
     tableBody.innerHTML = recentClients.map(client => {
-        const addedDate = client.createdAt 
+        const addedDate = client.createdAt
             ? new Date(client.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
             : 'N/A';
 

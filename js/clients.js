@@ -52,7 +52,7 @@ async function fetchClientsFromAPI() {
     }
 
     try {
-        const response = await fetch('https://dummyjson.com/users?limit=30');
+        const response = await fetch('https://dummyjson.com/users?limit=50');
         if (!response.ok) throw new Error('Network error');
 
         const data = await response.json();

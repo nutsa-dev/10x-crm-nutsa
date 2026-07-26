@@ -282,8 +282,10 @@ body.dark-mode .form-input-neo {
 }
 
 .btn-submit-glass {
-    width: 100%;
-    padding: 9px 18px;
+    width: auto;
+    min-width: 150px;
+    max-width: 220px;
+    padding: 9px 24px;
     font-size: 12px;
     font-weight: 800;
     color: #ffffff !important;
@@ -295,13 +297,29 @@ body.dark-mode .form-input-neo {
     align-items: center;
     justify-content: center;
     margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
     transition: all 0.2s ease;
 }
 
 .auth-body .btn-submit-glass {
-    padding: 10px 20px !important;
+    padding: 10px 24px !important;
     font-size: 14px !important;
     margin-top: 14px !important;
+    width: auto !important;
+    min-width: 160px !important;
+    max-width: 200px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.btn-load-more {
+    width: auto !important;
+    min-width: 140px !important;
+    max-width: 180px !important;
+    padding: 9px 24px !important;
+    margin: 0 auto !important;
+    display: inline-flex !important;
 }
 
 .btn-submit-glass:hover {
@@ -953,6 +971,7 @@ body.dark-mode .card.modal-card {
 
 .profile-card form .btn-submit-glass {
     margin-top: auto;
+    align-self: center;
 }
 
 .profile-card .btn-reset-data {
