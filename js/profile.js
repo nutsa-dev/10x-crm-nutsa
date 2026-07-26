@@ -16,6 +16,25 @@ const PROFILE_RULES = {
 // Global state holding current active user structure
 let currentUser = null;
 
+// Toggle password visibility (show / hide text)
+function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+
+    const eyeOpen = btn.querySelector('.eye-open');
+    const eyeClosed = btn.querySelector('.eye-closed');
+
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (eyeOpen) eyeOpen.style.display = 'none';
+        if (eyeClosed) eyeClosed.style.display = 'block';
+    } else {
+        input.type = 'password';
+        if (eyeOpen) eyeOpen.style.display = 'block';
+        if (eyeClosed) eyeClosed.style.display = 'none';
+    }
+}
+
 // ==========================================================================
 // 2. Initialization and UI rendering
 // ==========================================================================

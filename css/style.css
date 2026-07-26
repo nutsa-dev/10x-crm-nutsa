@@ -281,6 +281,43 @@ body.dark-mode .form-input-neo {
     margin-left: 10px;
 }
 
+/* Password Eye Toggle */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.password-wrapper .form-input-neo {
+    padding-right: 40px !important;
+}
+
+.btn-toggle-password {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    transition: color 0.2s ease, transform 0.15s ease;
+    z-index: 5;
+}
+
+.btn-toggle-password:hover {
+    color: var(--accent-orange);
+    transform: scale(1.1);
+}
+
+.btn-toggle-password:focus {
+    outline: none;
+}
+
 .btn-submit-glass {
     width: auto;
     min-width: 150px;

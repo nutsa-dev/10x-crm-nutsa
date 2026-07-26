@@ -15,6 +15,25 @@ const AUTH_RULES = {
 // 2. Helper Functions
 // ==========================================================================
 
+// Toggle password visibility (show / hide text)
+function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+
+    const eyeOpen = btn.querySelector('.eye-open');
+    const eyeClosed = btn.querySelector('.eye-closed');
+
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (eyeOpen) eyeOpen.style.display = 'none';
+        if (eyeClosed) eyeClosed.style.display = 'block';
+    } else {
+        input.type = 'password';
+        if (eyeOpen) eyeOpen.style.display = 'block';
+        if (eyeClosed) eyeClosed.style.display = 'none';
+    }
+}
+
 // Get users from the central Storage utility defined in guard.js
 function getUsers() {
     let users = Storage.get(STORAGE_KEYS.USERS);
