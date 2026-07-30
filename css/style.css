@@ -548,12 +548,12 @@ body.dark-mode .form-input-neo {
 
 .info-stage { display: flex; flex-direction: column; gap: 0.3rem; }
 .info-label-group { display: flex; justify-content: space-between; align-items: center; }
-.info-name { font-size: 0.8rem; font-weight: 800; color: var(--text-main); }
-.info-val { font-size: 0.85rem; font-weight: 800; color: var(--text-muted); }
+.info-name { font-size: 1rem; font-weight: 800; color: var(--text-main); }
+.info-val { font-size: 1.05rem; font-weight: 800; color: var(--text-muted); }
 
 .progress-track {
     width: 100%;
-    height: 8px;
+    height: 12px;
     background: var(--bg-color);
     box-shadow: var(--neo-shadow-in);
     border-radius: 20px;
@@ -566,8 +566,8 @@ body.dark-mode .form-input-neo {
     transition: width 1.2s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.fill-lead { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
-.fill-contacted { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.fill-lead { background: linear-gradient(90deg, #ff5500, #ff7a33); }
+.fill-contacted { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
 .fill-proposal { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
 .fill-won { background: linear-gradient(90deg, #10b981, #34d399); }
 .fill-lost { background: linear-gradient(90deg, #ef4444, #f87171); }
@@ -590,7 +590,7 @@ body.dark-mode .form-input-neo {
     margin-bottom: 0.6rem;
 }
 
-.section-header h2 { text-align: left; font-size: 1rem; font-weight: 800; margin: 0; }
+.section-header h2 { text-align: left; font-size: 1.2rem; font-weight: 800; margin: 0; }
 .link-view-all { color: var(--accent-orange); text-decoration: none; font-weight: 800; font-size: 0.82rem; }
 
 .table-responsive { flex: 1; overflow-y: auto; }
@@ -599,7 +599,7 @@ body.dark-mode .form-input-neo {
 .data-table th {
     color: var(--text-muted);
     font-weight: 800;
-    font-size: 0.8rem;
+    font-size: 0.95rem;
     text-transform: uppercase;
     padding: 0.5rem;
     border-bottom: 2px solid var(--border-color);
@@ -609,16 +609,16 @@ body.dark-mode .form-input-neo {
     padding: 0.6rem 0.5rem;
     border-bottom: 1px solid var(--border-color);
     vertical-align: middle;
-    font-size: 0.9rem;
+    font-size: 1.05rem;
     font-weight: 600;
 }
 
-.data-table td strong { font-size: 0.88rem; font-weight: 800; color: var(--text-main); }
+.data-table td strong { font-size: 1.05rem; font-weight: 800; color: var(--text-main); }
 
 .data-table td:last-child {
     white-space: nowrap;
     text-align: right;
-    font-size: 0.8rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: var(--text-muted);
 }
@@ -626,7 +626,7 @@ body.dark-mode .form-input-neo {
 .status-badge {
     padding: 0.25rem 0.6rem;
     border-radius: 20px;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     font-weight: 800;
     display: inline-block;
 }
@@ -984,7 +984,13 @@ body.dark-mode .card.modal-card {
 }
 
 .profile-header-card {
-    padding: 2.5rem 2rem !important;
+    padding: 0.8rem 2rem !important;
+}
+
+.name-email-horizontal {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
 }
 
 .profile-header-horizontal {

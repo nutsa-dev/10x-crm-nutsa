@@ -194,7 +194,7 @@ function drawPipelineChart(stageCounts) {
 
         const stages = [
             { label: 'Lead', count: animLead, targetColor: '#ff5500' },
-            { label: 'Contacted', count: animContacted, targetColor: '#f59e0b' },
+            { label: 'Contacted', count: animContacted, targetColor: '#3b82f6' },
             { label: 'Proposal', count: animProposal, targetColor: '#8b5cf6' },
             { label: 'Won', count: animWon, targetColor: '#10b981' },
             { label: 'Lost', count: animLost, targetColor: '#ef4444' }
