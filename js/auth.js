@@ -305,7 +305,7 @@ function handlePasswordInput(event) {
     container.style.display = 'flex';
     
     let score = 0;
-    if (password.length >= 8) score++;
+    if (password.length >= AUTH_RULES.MIN_PASSWORD_LENGTH) score++;
     if (/[a-z]/.test(password)) score++;
     if (/[A-Z]/.test(password)) score++;
     if (/[0-9]/.test(password)) score++;
@@ -328,6 +328,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const passwordInput = document.getElementById('password');
     if (passwordInput && document.getElementById('passwordStrengthContainer')) {
         passwordInput.addEventListener('input', handlePasswordInput);
+    }
+
+    const resetPasswordInput = document.getElementById('resetNewPassword');
+    if (resetPasswordInput && document.getElementById('passwordStrengthContainer')) {
+        resetPasswordInput.addEventListener('input', handlePasswordInput);
     }
 
     // Block non-ASCII (Georgian, Cyrillic, etc.) characters in email fields on auth pages
