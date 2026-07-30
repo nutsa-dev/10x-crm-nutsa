@@ -6,7 +6,7 @@
 // 1. Validation Rules & Constants (Easy to edit during live exam coding!)
 // ==========================================================================
 const AUTH_RULES = {
-    MIN_NAME_LENGTH: 3,
+    MIN_NAME_LENGTH: 2,
     MIN_PASSWORD_LENGTH: 8,
     EMAIL_REGEX: /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/
 };
