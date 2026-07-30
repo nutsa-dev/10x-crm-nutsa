@@ -196,7 +196,7 @@ h2 {
 }
 
 .card-subtitle {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--text-muted);
     margin-bottom: 14px;
@@ -970,22 +970,58 @@ body.dark-mode .card.modal-card {
 /* ==========================================================================
    8. PROFILE PAGE (2-Column Grid Layout)
    ========================================================================== */
-.profile-layout-grid {
+.profile-container-new {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.profile-3col-grid {
     display: grid;
-    grid-template-columns: 1fr 1.2fr 1.2fr;
-    gap: 1.2rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
     align-items: stretch;
 }
 
-.profile-col-left, .profile-col-middle, .profile-col-right {
+.profile-header-card {
+    padding: 2.5rem 2rem !important;
+}
+
+.profile-header-horizontal {
     display: flex;
-    flex-direction: column;
-    gap: 1.4rem;
+    align-items: center;
+    gap: 2rem;
+}
+
+.profile-details-horizontal {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+}
+
+.text-center-header h3 {
+    text-align: center !important;
+    font-size: 1.3rem !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.profile-reset-card {
+    align-items: center;
+    text-align: center;
+}
+.profile-reset-card .btn-reset-data {
+    max-width: 300px;
 }
 
 @media (max-width: 1024px) {
-    .profile-layout-grid {
+    .profile-3col-grid {
         grid-template-columns: 1fr;
+    }
+    .profile-details-horizontal {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
     }
 }
 
@@ -1043,28 +1079,32 @@ body.dark-mode .card.modal-card {
     flex-shrink: 0;
 }
 
+.profile-user-details {
+    flex: 1;
+}
+
 .profile-user-details h2 {
-    font-size: 1.5rem !important;
+    font-size: 1.4rem !important; /* Slightly adjusted to fit long emails */
     text-align: left !important;
     margin: 0 0 0.2rem 0 !important;
 }
 
 .user-email-text {
-    font-size: 0.8rem;
+    font-size: 1.05rem;
     font-weight: 600;
     color: var(--text-muted);
 }
 
 .profile-meta {
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: 1.15rem;
+    font-weight: 700;
     color: var(--accent-orange);
     margin-top: 0.3rem;
 }
 
 .danger-card { border-left: 3px solid var(--danger-color); }
-.danger-card .card-subtitle { font-size: 0.8rem !important; color: var(--text-main) !important; font-weight: 600 !important; }
-.btn-reset-data { margin-top: 0.7rem; width: 100%; font-size: 0.8rem; padding: 0.6rem; }
+.danger-card .card-subtitle { font-size: 0.95rem !important; color: var(--text-main) !important; font-weight: 600 !important; }
+.btn-reset-data { margin-top: 0.7rem; width: 100%; font-size: 0.9rem; padding: 0.6rem; }
 
 /* ==========================================================================
    9. TOAST NOTIFICATIONS & LOADING/EMPTY STATES

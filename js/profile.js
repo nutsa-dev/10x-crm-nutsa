@@ -9,8 +9,9 @@ document.addEventListener('DOMContentLoaded', initProfile);
 // 1. Validation Rules & Constants (Easy to edit during live exam coding!)
 // ==========================================================================
 const PROFILE_RULES = {
-    MIN_NAME_LENGTH: 3,
-    MIN_PASSWORD_LENGTH: 8
+    MIN_NAME_LENGTH: 2,
+    MIN_PASSWORD_LENGTH: 8,
+    EMAIL_REGEX: /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/
 };
 
 // Global state holding current active user structure
@@ -49,7 +50,7 @@ function initProfile() {
     const users = Storage.get(STORAGE_KEYS.USERS, []);
     
     // Find active user profile from database
-    currentUser = users.find(u => u.email === session.email || u.id === session.userId);
+    currentUser = users.find(u => (session.userId && u.id === session.userId) || u.email === session.email);
 
     if (!currentUser) {
         window.location.href = 'index.html';
@@ -67,6 +68,7 @@ function initProfile() {
 
     // 2.4. Bind Event Listeners dynamically
     document.getElementById('editProfileForm')?.addEventListener('submit', handleProfileUpdate);
+    document.getElementById('changeEmailForm')?.addEventListener('submit', handleEmailChange);
     document.getElementById('changePasswordForm')?.addEventListener('submit', handlePasswordChange);
 }
 
@@ -84,13 +86,16 @@ function renderProfileHeader() {
 
     if (initialsEl) initialsEl.textContent = initials;
     if (nameEl) nameEl.textContent = currentUser.fullName;
-    if (emailEl) emailEl.textContent = currentUser.email;
+    if (emailEl) {
+        emailEl.textContent = currentUser.email;
+        emailEl.style.display = 'block';
+    }
 
     if (metaEl) {
         const joinDate = currentUser.createdAt 
-            ? new Date(currentUser.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+            ? new Date(currentUser.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
             : 'Recently';
-        metaEl.textContent = `${currentUser.company || 'Independent LLC'} • Member since ${joinDate}`;
+        metaEl.textContent = `User since: ${joinDate}`;
     }
 }
 
@@ -112,20 +117,25 @@ function handleProfileUpdate(event) {
     const nameInput = document.getElementById('editFullName');
     const companyInput = document.getElementById('editCompany');
 
-    const fullName = nameInput.value.trim();
-    const company = companyInput.value.trim();
+    const fullName = nameInput ? nameInput.value.trim() : '';
+    const company = companyInput ? companyInput.value.trim() : '';
+
+    let hasError = false;
 
     // Verify name length
     if (fullName.length < PROFILE_RULES.MIN_NAME_LENGTH) {
-        nameInput.classList.add('input-error');
-        document.getElementById('editFullNameError').textContent = `Full name must be at least ${PROFILE_RULES.MIN_NAME_LENGTH} characters`;
-        return;
+        if (nameInput) nameInput.classList.add('input-error');
+        const errEl = document.getElementById('editFullNameError');
+        if (errEl) errEl.textContent = `Full name must be at least ${PROFILE_RULES.MIN_NAME_LENGTH} characters`;
+        hasError = true;
     }
+
+    if (hasError) return;
 
     // 3.1. Update central USERS array in storage
     let users = Storage.get(STORAGE_KEYS.USERS, []);
     users = users.map(u => {
-        if (u.email === currentUser.email) {
+        if ((currentUser.id && u.id === currentUser.id) || u.email === currentUser.email) {
             return { ...u, fullName: fullName, company: company };
         }
         return u;
@@ -143,6 +153,68 @@ function handleProfileUpdate(event) {
 
     renderProfileHeader();
     showToast('Profile updated successfully ✓', true);
+}
+
+// ==========================================================================
+// 3.5. Change Email Flow
+// ==========================================================================
+function handleEmailChange(event) {
+    event.preventDefault();
+    clearProfileErrors();
+
+    const currentEmailInput = document.getElementById('currentEmail');
+    const newEmailInput = document.getElementById('newEmail');
+
+    const currentEmail = currentEmailInput ? currentEmailInput.value.trim().toLowerCase() : '';
+    const newEmail = newEmailInput ? newEmailInput.value.trim().toLowerCase() : '';
+
+    let hasError = false;
+
+    if (currentEmail !== currentUser.email) {
+        if (currentEmailInput) currentEmailInput.classList.add('input-error');
+        const errEl = document.getElementById('currentEmailError');
+        if (errEl) errEl.textContent = 'Current email is incorrect';
+        hasError = true;
+    }
+
+    if (!PROFILE_RULES.EMAIL_REGEX.test(newEmail)) {
+        if (newEmailInput) newEmailInput.classList.add('input-error');
+        const errEl = document.getElementById('newEmailError');
+        if (errEl) errEl.textContent = 'Please enter a valid email address';
+        hasError = true;
+    } else {
+        const users = Storage.get(STORAGE_KEYS.USERS, []);
+        const duplicateUser = users.find(u => u.email === newEmail && u.id !== currentUser.id && u.email !== currentUser.email);
+        if (duplicateUser) {
+            if (newEmailInput) newEmailInput.classList.add('input-error');
+            const errEl = document.getElementById('newEmailError');
+            if (errEl) errEl.textContent = 'An account with this email address already exists';
+            hasError = true;
+        }
+    }
+
+    if (hasError) return;
+
+    // Update central USERS array
+    let users = Storage.get(STORAGE_KEYS.USERS, []);
+    users = users.map(u => {
+        if ((currentUser.id && u.id === currentUser.id) || u.email === currentUser.email) {
+            return { ...u, email: newEmail };
+        }
+        return u;
+    });
+    Storage.set(STORAGE_KEYS.USERS, users);
+
+    // Update session
+    const session = Storage.get(STORAGE_KEYS.SESSION) || {};
+    session.email = newEmail;
+    Storage.set(STORAGE_KEYS.SESSION, session);
+
+    currentUser.email = newEmail;
+
+    document.getElementById('changeEmailForm').reset();
+    renderProfileHeader();
+    showToast('Email updated successfully ✓', true);
 }
 
 // ==========================================================================
@@ -194,7 +266,7 @@ function handlePasswordChange(event) {
     // Save password modification to users array
     let users = Storage.get(STORAGE_KEYS.USERS, []);
     users = users.map(u => {
-        if (u.email === currentUser.email) {
+        if ((currentUser.id && u.id === currentUser.id) || u.email === currentUser.email) {
             return { ...u, password: newPass };
         }
         return u;
