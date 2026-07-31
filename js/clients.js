@@ -403,8 +403,10 @@ function endCall() {
             if (client.id === currentDetailsClientId) {
                 const updatedNotes = [...(client.notes || [])];
                 updatedNotes.push({
+                    id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
                     text: `📞 Call duration: ${durationText}`,
-                    date: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })
+                    date: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }),
+                    isCompleted: false
                 });
                 return { ...client, notes: updatedNotes };
             }
@@ -426,15 +428,52 @@ function renderNotes(notes) {
     }
 
     container.innerHTML = '';
-    notes.forEach(note => {
+    notes.forEach((note, index) => {
         const noteHTML = `
-            <div class="note-item">
+            <div class="note-item ${note.isCompleted ? 'completed-note' : ''}">
                 <p class="note-text">${escapeHTML(note.text)}</p>
-                <span class="note-date">${note.date}</span>
+                <div class="note-actions">
+                    <input type="checkbox" class="note-checkbox" ${note.isCompleted ? 'checked' : ''} onchange="toggleNoteStatus('${note.id || index}')">
+                    <button class="btn-delete-note" onclick="deleteNote('${note.id || index}')">❌</button>
+                </div>
             </div>
         `;
         container.insertAdjacentHTML('beforeend', noteHTML);
     });
+}
+
+function toggleNoteStatus(noteIdOrIndex) {
+    clientsState = clientsState.map(client => {
+        if (client.id === currentDetailsClientId) {
+            const updatedNotes = [...(client.notes || [])];
+            const noteIndex = updatedNotes.findIndex((n, idx) => n.id === noteIdOrIndex || idx.toString() === noteIdOrIndex.toString());
+            if (noteIndex !== -1) {
+                updatedNotes[noteIndex].isCompleted = !updatedNotes[noteIndex].isCompleted;
+            }
+            return { ...client, notes: updatedNotes };
+        }
+        return client;
+    });
+    Storage.set(STORAGE_KEYS.CLIENTS, clientsState);
+    const updatedClient = clientsState.find(c => c.id === currentDetailsClientId);
+    renderNotes(updatedClient.notes);
+}
+
+function deleteNote(noteIdOrIndex) {
+    clientsState = clientsState.map(client => {
+        if (client.id === currentDetailsClientId) {
+            const updatedNotes = [...(client.notes || [])];
+            const noteIndex = updatedNotes.findIndex((n, idx) => n.id === noteIdOrIndex || idx.toString() === noteIdOrIndex.toString());
+            if (noteIndex !== -1) {
+                updatedNotes.splice(noteIndex, 1);
+            }
+            return { ...client, notes: updatedNotes };
+        }
+        return client;
+    });
+    Storage.set(STORAGE_KEYS.CLIENTS, clientsState);
+    const updatedClient = clientsState.find(c => c.id === currentDetailsClientId);
+    renderNotes(updatedClient.notes);
 }
 
 function handleAddNote() {
@@ -447,8 +486,10 @@ function handleAddNote() {
         if (client.id === currentDetailsClientId) {
             const updatedNotes = [...(client.notes || [])];
             updatedNotes.push({
+                id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
                 text: text,
-                date: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })
+                date: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }),
+                isCompleted: false
             });
             return { ...client, notes: updatedNotes };
         }

@@ -100,6 +100,7 @@ function renderDashboardMetrics() {
 
     drawPipelineChart(stageCounts);
     renderRecentClientsTable(clients);
+    renderClientNotes(clients);
 }
 
 let pipelineChartAnimationId = null;
@@ -289,6 +290,74 @@ function renderRecentClientsTable(clients) {
             </tr>
         `;
     }).join('');
+}
+
+// 5. Render all client notes in dashboard feed
+function renderClientNotes(clients) {
+    const container = document.getElementById('dashboardNotesFeed');
+    if (!container) return;
+
+    const allNotes = [];
+    clients.forEach(client => {
+        if (client.notes && client.notes.length > 0) {
+            client.notes.forEach((note, index) => {
+                allNotes.push({
+                    clientId: client.id,
+                    noteId: note.id || index, // fallback to index if no id
+                    clientName: client.name || 'Unknown',
+                    text: note.text,
+                    date: note.date,
+                    isCompleted: note.isCompleted || false
+                });
+            });
+        }
+    });
+
+    if (allNotes.length === 0) {
+        container.innerHTML = '<p class="no-notes-text">No notes recorded yet.</p>';
+        return;
+    }
+
+    allNotes.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    container.innerHTML = allNotes.map(note => `
+        <div class="dashboard-note-item ${note.isCompleted ? 'completed-note' : ''}">
+            <div class="dashboard-note-header">
+                <strong class="dashboard-note-client">${escapeHTML(note.clientName)}</strong>
+                <div class="note-actions">
+                    <input type="checkbox" class="note-checkbox" ${note.isCompleted ? 'checked' : ''} onchange="toggleDashboardNote('${note.clientId}', '${note.noteId}')">
+                    <button class="btn-delete-note" onclick="deleteDashboardNote('${note.clientId}', '${note.noteId}')">❌</button>
+                </div>
+            </div>
+            <p class="dashboard-note-text">${escapeHTML(note.text)}</p>
+        </div>
+    `).join('');
+}
+
+function toggleDashboardNote(clientId, noteId) {
+    const clients = Storage.get(STORAGE_KEYS.CLIENTS, []);
+    const clientIndex = clients.findIndex(c => c.id.toString() === clientId.toString());
+    if (clientIndex !== -1 && clients[clientIndex].notes) {
+        const noteIndex = clients[clientIndex].notes.findIndex((n, idx) => n.id === noteId || idx.toString() === noteId.toString());
+        if (noteIndex !== -1) {
+            clients[clientIndex].notes[noteIndex].isCompleted = !clients[clientIndex].notes[noteIndex].isCompleted;
+            Storage.set(STORAGE_KEYS.CLIENTS, clients);
+            renderClientNotes(clients);
+        }
+    }
+}
+
+function deleteDashboardNote(clientId, noteId) {
+    const clients = Storage.get(STORAGE_KEYS.CLIENTS, []);
+    const clientIndex = clients.findIndex(c => c.id.toString() === clientId.toString());
+    if (clientIndex !== -1 && clients[clientIndex].notes) {
+        const noteIndex = clients[clientIndex].notes.findIndex((n, idx) => n.id === noteId || idx.toString() === noteId.toString());
+        if (noteIndex !== -1) {
+            clients[clientIndex].notes.splice(noteIndex, 1);
+            Storage.set(STORAGE_KEYS.CLIENTS, clients);
+            renderClientNotes(clients);
+        }
+    }
 }
 
 // Helper to sanitize HTML strings
