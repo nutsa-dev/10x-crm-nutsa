@@ -149,31 +149,41 @@
                     <canvas id="pipelineCanvas" width="240" height="240" style="max-width: 100%; height: auto; display: inline-block;"></canvas>
                 </div>
             </section>
+            <div class="dashboard-right-col">
+                <section class="recent-clients-section">
+                    <div class="section-header">
+                        <h2>Recent Clients</h2>
+                        <a href="clients.html" class="link-view-all">View All Clients &rarr;</a>
+                    </div>
 
-            <section class="recent-clients-section">
-                <div class="section-header">
-                    <h2>Recent Clients</h2>
-                    <a href="clients.html" class="link-view-all">View All Clients &rarr;</a>
-                </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 32%;">Name</th>
+                                    <th style="width: 32%;">Company</th>
+                                    <th style="width: 18%;">Status</th>
+                                    <th style="width: 18%; text-align: right;">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentClientsTable">
+                                <tr>
+                                    <td colspan="4" class="text-center">Loading clients...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
 
-                <div class="table-responsive">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 32%;">Name</th>
-                                <th style="width: 32%;">Company</th>
-                                <th style="width: 18%;">Status</th>
-                                <th style="width: 18%; text-align: right;">Date</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recentClientsTable">
-                            <tr>
-                                <td colspan="4" class="text-center">Loading clients...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
+                <section class="client-notes-section">
+                    <div class="section-header">
+                        <h2>📝 Client Notes</h2>
+                    </div>
+                    <div class="notes-feed" id="dashboardNotesFeed">
+                        <p class="no-notes-text">No notes recorded yet.</p>
+                    </div>
+                </section>
+            </div>
 
         </div>
 
