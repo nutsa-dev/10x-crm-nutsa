@@ -399,7 +399,7 @@ body.dark-mode .form-input-neo {
     max-width: 1440px !important;
     width: 82% !important;
     margin: 0 auto !important;
-    padding: 0.5rem 0 !important;
+    padding: 1rem 0 !important;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -421,8 +421,8 @@ body.dark-mode .form-input-neo {
     text-decoration: none;
     color: var(--text-muted);
     font-weight: 800;
-    font-size: 0.92rem;
-    padding: 0.45rem 0.85rem;
+    font-size: 1.1rem;
+    padding: 0.55rem 1rem;
     border-radius: var(--radius-sm);
     transition: all 0.2s ease;
 }
@@ -430,11 +430,11 @@ body.dark-mode .form-input-neo {
 .nav-link:hover { color: var(--text-main); box-shadow: var(--neo-shadow-in); }
 .nav-link.active { color: var(--accent-orange); box-shadow: var(--neo-shadow-in); }
 
-.header-actions { display: flex; align-items: center; gap: 0.5rem; }
+.header-actions { display: flex; align-items: center; gap: 0.75rem; }
 
 .live-clock {
     font-family: 'Inter', monospace;
-    font-size: 0.82rem;
+    font-size: 0.95rem;
     font-weight: 800;
     color: var(--text-muted);
     padding: 0.4rem 0.8rem;
